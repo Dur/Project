@@ -2,11 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package opaclient;
+package pl.dur.opa.client;
 
-import java.rmi.Naming;
+import java.io.File;
 import java.rmi.RMISecurityManager;
 import java.rmi.Remote;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import javax.swing.JFileChooser;
+import pl.dur.opa.interfaces.Echo;
 
 /**
  *
@@ -18,14 +22,17 @@ public class OpaClient
 	{
 		try
 		{
-			Remote remote = Naming.lookup( "ECHO-SERVER" );
+			Registry registry = LocateRegistry.getRegistry("192.168.1.18");
+			Remote remote = registry.lookup( "ECHO-SERVER" );
 			Echo server = null;
 			if( remote instanceof Echo )
 			{
 				server = (Echo) remote;
 			}
-			String result = server.echo( "Hello server" );
-			System.out.println( result );
+			JFileChooser result = server.echo( "Hello server" );
+			result.showOpenDialog(null);
+			File file = result.getSelectedFile();
+			server.onSelectFile( file );
 		}
 		catch( Exception e )
 		{
