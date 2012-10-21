@@ -10,6 +10,7 @@ import java.rmi.Remote;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import javax.swing.JFileChooser;
+import net.sf.vfsjfilechooser.VFSJFileChooser;
 import pl.dur.opa.interfaces.Echo;
 
 /**
