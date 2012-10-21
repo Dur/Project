@@ -13,17 +13,9 @@ import javax.swing.JFileChooser;
  *
  * @author Dur
  */
-public class OpaServer extends UnicastRemoteObject implements Echo
+public class OpaServer extends UnicastRemoteObject
 {
 	private static final long serialVersionUID = 7L;
-
-	@Override
-	public JFileChooser echo( String input ) throws RemoteException
-	{
-		File file = new File("C:\\");
-		JFileChooser jsf = new JFileChooser(file);
-		return jsf;
-	}
 
 	public OpaServer() throws RemoteException
 	{
@@ -46,11 +38,5 @@ public class OpaServer extends UnicastRemoteObject implements Echo
 		{
 			System.out.println( x.toString() );
 		}
-	}
-
-	@Override
-	public void onSelectFile( File file ) throws RemoteException
-	{
-		System.out.println ( "can read " + file.canRead() );
 	}
 }
