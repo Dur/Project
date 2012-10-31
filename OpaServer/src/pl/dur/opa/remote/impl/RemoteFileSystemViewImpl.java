@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package pl.dur.opa.file.browser;
+package pl.dur.opa.remote.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.MessageFormat;
 import javax.swing.filechooser.FileSystemView;
-import pl.dur.opa.interfaces.RemoteFileSystemView;
+import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
+import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
 
 /**
  * Class implements RemoteFileSystemView and make it available for clients to view server side file system. 
@@ -152,26 +153,5 @@ public class RemoteFileSystemViewImpl extends UnicastRemoteObject implements Rem
 	public final File createRemoteFileObject( final File dir, final String filename ) throws RemoteException
 	{
 		return localSystem.createFileObject( dir, filename );
-	}
-	
-	public static void main( String args[] )
-	{
-		System.setSecurityManager( new RMISecurityManager() );
-		try
-		{
-			File root = new File("C:\\");
-			File[] roots = new File[1];
-			roots[0]=root;
-			RemoteFileSystemViewImpl e = new RemoteFileSystemViewImpl( roots, root );
-			//RemoteFileSystemViewImpl stub =
-              //  (RemoteFileSystemViewImpl) UnicastRemoteObject.exportObject(e, 0);
-			Registry registry = LocateRegistry.createRegistry( 1099 );
-			registry.rebind( "SERVER", e );
-
-		}
-		catch( Exception x )
-		{
-			System.out.println( x.toString() );
-		}
 	}
 }

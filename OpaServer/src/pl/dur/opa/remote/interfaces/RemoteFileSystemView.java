@@ -1,4 +1,4 @@
-package pl.dur.opa.interfaces;
+package pl.dur.opa.remote.interfaces;
 
 import java.io.File;
 import java.rmi.Remote;

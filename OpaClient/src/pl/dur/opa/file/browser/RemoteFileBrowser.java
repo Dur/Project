@@ -5,10 +5,9 @@
 package pl.dur.opa.file.browser;
 
 import java.io.File;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import javax.swing.filechooser.FileSystemView;
-import pl.dur.opa.interfaces.RemoteFileSystemView;
+import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
 
 /**
  * Class extends FileSystemView. Makes user availlable to see remote system file system.
