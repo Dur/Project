@@ -11,6 +11,7 @@ import java.rmi.registry.Registry;
 import pl.dur.opa.remote.impl.FileManipulatorImpl;
 import pl.dur.opa.remote.impl.RemoteFileSystemViewImpl;
 import pl.dur.opa.remote.interfaces.FileManipulator;
+import pl.dur.opa.server.configuration.Configuration;
 
 /**
  * Class which starts server and prepares it to serve clients.
@@ -35,6 +36,7 @@ public final class OpaServer
 		System.setSecurityManager( new RMISecurityManager() );
 		try
 		{
+			Configuration conf = new Configuration();
 			File root = new File("C:\\");
 			File[] roots = new File[1];
 			roots[0]=root;
