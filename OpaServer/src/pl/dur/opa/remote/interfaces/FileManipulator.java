@@ -13,37 +13,38 @@ import java.rmi.RemoteException;
 public interface FileManipulator extends Remote
 {
 	/**
-	 * Returns port number to which client should connect to download file.
+	 * Returns String which is a key to send back by socket.
+	 * This key determine which operation server will do for client.
 	 *
-	 * @param file - file to download.\
-	 * @return port number to connect.
+	 * @param file - file to download.
+	 * @return String key for task search.
 	 * @throws RemoteException
 	 */
-	int getFile( File file ) throws RemoteException;
+	String getFile( File file ) throws RemoteException;
 
 	/**
-	 * Returns port number to which client should connect to download file.
-	 *
+	 * Returns String which is a key to send back by socket.
+	 * This key determine which operation server will do for client.
 	 * @param files - files to download.
-	 * @return port number to connect.
+	 * @return String key for task search.
 	 * @throws RemoteException
 	 */
-	int getFiles( File[] file ) throws RemoteException;
+	String getFiles( File[] file ) throws RemoteException;
 	
 	/**
-	 * Returns port number for client to connect.
-	 * On this port client should connect to save file.
-	 * @return port number.
+	 * Returns String which is a key to send back by socket.
+	 * This key determine which operation server will do for client.
+	 * @return String key for task search.
 	 * @param directory - directory in which sended file should be saved.
 	 * @param fileName - name of file to save.
 	 * 
 	 * @throws RemoteException
 	 */
-	int saveFile( File directory, String fileName ) throws RemoteException;
+	String saveFile( File directory, String fileName ) throws RemoteException;
 	
 	/**
-	 * Returns port number for client to connect.
-	 * On this port client should connect to save files (more than one).
+	 * Returns String which is a key to send back by socket.
+	 * This key determine which operation server will do for client.
 	 * Diference between saveFile() method is that after receiving first file, server will not close connection.
 	 * Use this method if u want to save more than one file.
 	 * All files will be save in the same directory.
@@ -51,7 +52,7 @@ public interface FileManipulator extends Remote
 	 * @param directory - directory in which sended files should be saved.
 	 * @throws RemoteException
 	 */
-	int saveFiles( File directory ) throws RemoteException;
+	String saveFiles( File directory ) throws RemoteException;
 	
 	/**
 	 * Checks if selected file is the same as one located on server

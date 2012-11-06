@@ -11,10 +11,10 @@ import pl.dur.opa.connection.SocketWrapper;
  *
  * @author Dur
  */
-public class SendFileTask implements Task
+public class SendFileTask implements Task, SocketTask
 {
 	private final File file;
-	private final Integer port;
+	private SocketWrapper socketWrapper;
 
 	/**
 	 * Constructor.
@@ -22,17 +22,21 @@ public class SendFileTask implements Task
 	 * @param newFileToSend - file to be send to client.
 	 * @param newSocketPort - port for socket.
 	 */
-	public SendFileTask( final File newFileToSend, final Integer newSocketPort )
+	public SendFileTask( final File newFileToSend )
 	{
 		this.file = newFileToSend;
-		this.port = newSocketPort;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		final SocketWrapper socket = new SocketWrapper( port );
-		socket.sendFile( file );
+		socketWrapper.sendFile( file );
 		return true;
+	}
+
+	@Override
+	public void setSocket( SocketWrapper socket )
+	{
+		this.socketWrapper = socket;
 	}
 }

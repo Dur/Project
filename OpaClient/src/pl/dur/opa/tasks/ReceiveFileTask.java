@@ -12,31 +12,35 @@ import pl.dur.opa.sockets.SocketWrapper;
 public class ReceiveFileTask implements Task
 {
 	private final File directory;
-	private final Integer port;
+	private final String key;
 	private final String fileName;
 	private final String host;
+	private final Integer port;
 
 	/**
 	 * Constructor.
 	 * @param newDirectory - directory where file should be stored.
-	 * @param newSocketPort - port for socket to open.
+	 * @param newKey - key which client must send to server.
 	 * @param newFileName - name of new file.
 	 * @param newHost - host to connect.
+	 * @param port - server port to connect.
 	 */
-	public ReceiveFileTask( final File newDirectory, final Integer newSocketPort, 
-							final String newFileName, final String newHost )
+	public ReceiveFileTask( final File newDirectory, final String newKey, 
+							final String newFileName, final String newHost,
+							final Integer port )
 	{
 		this.directory = newDirectory;
-		this.port = newSocketPort;
+		this.key = newKey;
 		this.fileName = newFileName;
 		this.host = newHost;
+		this.port = port;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
 		final SocketWrapper socket = new SocketWrapper( port, host );
-		socket.receiveFile( fileName, directory );
+		socket.receiveFile( key, fileName, directory );
 		return true;
 	}
 }

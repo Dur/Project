@@ -48,16 +48,17 @@ public final class OpaClient
 			JFileChooser chooser = new JFileChooser( fileBrowser );
 			chooser.showOpenDialog( null );
 			File file = chooser.getSelectedFile();
-			int port = mnipulator.getFile( file );
-			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( file, port, file.getName(), "localhost") );
+			String key = mnipulator.getFile( file );
+			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( file, key, file.getName(), 
+														"localhost", 80) );
 			Thread thread = new Thread(executor);
 			thread.start();
 			
 			chooser = new JFileChooser( );
 			chooser.showOpenDialog( null );
 			file = chooser.getSelectedFile();
-			port = mnipulator.saveFile( file, file.getName() );
-			executor = new TaskExecutor( new SendFileTask( file, port, "localhost") );
+			key = mnipulator.saveFile( file, file.getName() );
+			executor = new TaskExecutor( new SendFileTask( file, 80, "localhost", key) );
 			thread = new Thread(executor);
 			thread.start();
 		}

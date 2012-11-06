@@ -16,6 +16,7 @@ public class SendFileTask implements Task
 	private final File file;
 	private final Integer port;
 	private final String host;
+	private final String key;
 
 	/**
 	 * Constructor.
@@ -24,11 +25,13 @@ public class SendFileTask implements Task
 	 * @param newSocketPort - port for socket.
 	 * @param newHost - host to connnect.
 	 */
-	public SendFileTask( final File newFileToSend, final Integer newSocketPort, final String newHost )
+	public SendFileTask( final File newFileToSend, final Integer newSocketPort, 
+						final String newHost, final String key )
 	{
 		this.file = newFileToSend;
 		this.port = newSocketPort;
 		this.host = newHost;
+		this.key = key;
 	}
 
 	@Override
@@ -36,7 +39,7 @@ public class SendFileTask implements Task
 	{
 		final SocketWrapper socket = new SocketWrapper( port, host );
 		System.out.println("befor calling send method");
-		socket.sendFile( file );
+		socket.sendFile( key, file );
 		return true;
 	}
 }

@@ -9,30 +9,33 @@ import pl.dur.opa.connection.SocketWrapper;
  * File is save on local server file system.
  * @author Dur
  */
-public class ReceiveFileTask implements Task
+public class ReceiveFileTask implements Task, SocketTask
 {
 	private final File directory;
-	private final Integer port;
 	private final String fileName;
+	private SocketWrapper socketWrapper;
 
 	/**
 	 * Constructor.
 	 * @param newDirectory - directory where file should be stored.
-	 * @param newSocketPort - port for socket to open.
 	 * @param newFileName - name of new file.
 	 */
-	public ReceiveFileTask( final File newDirectory, final Integer newSocketPort, final String newFileName )
+	public ReceiveFileTask( final File newDirectory, final String newFileName )
 	{
 		this.directory = newDirectory;
-		this.port = newSocketPort;
 		this.fileName = newFileName;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		final SocketWrapper socket = new SocketWrapper( port );
-		socket.receiveFile( fileName, directory );
+		socketWrapper.receiveFile( fileName, directory );
 		return true;
+	}
+
+	@Override
+	public void setSocket( SocketWrapper socket )
+	{
+		this.socketWrapper = socket;
 	}
 }

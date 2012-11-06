@@ -8,6 +8,7 @@ import java.io.File;
 import java.rmi.RMISecurityManager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import pl.dur.opa.connection.ConnectionAccepter;
 import pl.dur.opa.remote.impl.FileManipulatorImpl;
 import pl.dur.opa.remote.impl.RemoteFileSystemViewImpl;
 import pl.dur.opa.remote.interfaces.FileManipulator;
@@ -45,6 +46,8 @@ public final class OpaServer
 			Registry registry = LocateRegistry.createRegistry( 1099 );
 			registry.rebind( "FILE_VIEW", fileView );
 			registry.rebind( "MANIPULATOR", manipulator);
+			Thread connectionListener = new Thread( new ConnectionAccepter( 80 ) );
+			connectionListener.start();
 		}
 		catch( Exception x )
 		{

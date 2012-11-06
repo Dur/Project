@@ -28,25 +28,25 @@ public class FileManipulatorImpl extends UnicastRemoteObject implements FileMani
 	}
 	
 	@Override
-	public final int getFile( final File file ) throws RemoteException
+	public final String getFile( final File file ) throws RemoteException
 	{
 		return connectionAdmin.getSocketNumForFileSending( file );
 	}
 
 	@Override
-	public final int getFiles( final File[] files ) throws RemoteException
+	public final String getFiles( final File[] files ) throws RemoteException
 	{
 		throw new UnsupportedOperationException( "Not supported yet." );
 	}
 
 	@Override
-	public final int saveFile( final File directory, String fileName ) throws RemoteException
+	public final String saveFile( final File directory, String fileName ) throws RemoteException
 	{
 		return connectionAdmin.getSocketForFileReceiving( directory, fileName );
 	}
 
 	@Override
-	public final int saveFiles( final File directory ) throws RemoteException
+	public final String saveFiles( final File directory ) throws RemoteException
 	{
 		throw new UnsupportedOperationException( "Not supported yet." );
 	}

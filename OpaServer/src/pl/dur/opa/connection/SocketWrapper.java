@@ -8,20 +8,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
 
 /**
- * Class to wrapp socket and make some operations on it. It can send files ad make some other stuff.
+ * Class to wrapp socket and make some operations on it. It can send files ad
+ * make some other stuff.
  *
  * @author Dur
  */
 public class SocketWrapper
 {
-	private static int SOCKET_OPTION;
-	private int port;
-	private ServerSocket socket;
 	private Socket client;
 	private LocalFileAdministrator fileAdmin;
 	private final static int PACKAGE_SIZE = 1024;
@@ -32,40 +29,14 @@ public class SocketWrapper
 	 *
 	 * @param newPort - port for new socket.
 	 */
-	public SocketWrapper( final int newPort )
+	public SocketWrapper( final Socket socket )
 	{
-		this.port = newPort;
-		try
-		{
-			socket = new ServerSocket( port );
-			socket.setReuseAddress( true );
-
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace();
-		}
-	}
-
-	public final static int getAvailablePort()
-	{
-		int port = -1;
-		try
-		{
-			ServerSocket socket = new ServerSocket( 0 );
-			port = socket.getLocalPort();
-			socket.setReuseAddress( true );
-			socket.close();
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace();
-		}
-		return port;
+			client = socket;
 	}
 
 	/**
-	 * Method opens new socket and after clients connection send selected file. LocalFileAdministrator class is used to administrate selected file.
+	 * Method opens new socket and after clients connection send selected file.
+	 * LocalFileAdministrator class is used to administrate selected file.
 	 *
 	 * @param name - name of file.
 	 * @param directory - directory where selected file should be stored.
@@ -74,8 +45,6 @@ public class SocketWrapper
 	{
 		try
 		{
-			client = socket.accept();
-			System.out.println("client connected");
 			fileAdmin = new LocalFileAdministrator( directory, name );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			int len = 0;
@@ -87,7 +56,6 @@ public class SocketWrapper
 				inFile.write( buffer, 0, len );
 			}
 			client.close();
-			socket.close();
 			inFile.close();
 		}
 		catch( IOException ex )
@@ -100,7 +68,6 @@ public class SocketWrapper
 	{
 		try
 		{
-			client = socket.accept();
 			fileAdmin = new LocalFileAdministrator( file );
 			File fileToSend = fileAdmin.getFile();
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
