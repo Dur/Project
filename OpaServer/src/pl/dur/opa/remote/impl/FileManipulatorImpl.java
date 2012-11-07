@@ -11,8 +11,9 @@ import pl.dur.opa.connection.ConnectionAdministrator;
 import pl.dur.opa.remote.interfaces.FileManipulator;
 
 /**
- * Class implements file manipulator interface.
- * Methods in this class are calling new threads to serve clients calls.
+ * Class implements file manipulator interface. Methods in this class are
+ * calling new threads to serve clients calls.
+ *
  * @author Dur
  */
 public class FileManipulatorImpl extends UnicastRemoteObject implements FileManipulator
@@ -26,7 +27,7 @@ public class FileManipulatorImpl extends UnicastRemoteObject implements FileMani
 	{
 		connectionAdmin = new ConnectionAdministrator();
 	}
-	
+
 	@Override
 	public final String getFile( final File file ) throws RemoteException
 	{
@@ -50,6 +51,4 @@ public class FileManipulatorImpl extends UnicastRemoteObject implements FileMani
 	{
 		throw new UnsupportedOperationException( "Not supported yet." );
 	}
-
-	
 }

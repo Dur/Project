@@ -13,6 +13,7 @@ import pl.dur.opa.remote.impl.FileManipulatorImpl;
 import pl.dur.opa.remote.impl.RemoteFileSystemViewImpl;
 import pl.dur.opa.remote.interfaces.FileManipulator;
 import pl.dur.opa.server.configuration.Configuration;
+import pl.dur.opa.server.configuration.UsersConfiguration;
 
 /**
  * Class which starts server and prepares it to serve clients.
@@ -48,6 +49,7 @@ public final class OpaServer
 			registry.rebind( "MANIPULATOR", manipulator);
 			Thread connectionListener = new Thread( new ConnectionAccepter( 80 ) );
 			connectionListener.start();
+			UsersConfiguration users = new UsersConfiguration();
 		}
 		catch( Exception x )
 		{

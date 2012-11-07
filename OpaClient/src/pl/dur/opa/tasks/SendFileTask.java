@@ -38,7 +38,6 @@ public class SendFileTask implements Task
 	public final Object execute( final Object params )
 	{
 		final SocketWrapper socket = new SocketWrapper( port, host );
-		System.out.println("befor calling send method");
 		socket.sendFile( key, file );
 		return true;
 	}

@@ -24,7 +24,7 @@ public class LocalFileAdministrator
 		selectedFile = null;
 		try
 		{
-			selectedFile = new File( "C:" + File.separator + "copies" + File.separator + newFileName );
+			selectedFile = new File( directory.getAbsolutePath() + File.separator + newFileName );
 			if( !selectedFile.exists() )
 			{
 				selectedFile.createNewFile();
