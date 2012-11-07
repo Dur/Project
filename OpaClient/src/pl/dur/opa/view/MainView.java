@@ -16,6 +16,14 @@ public class MainView extends javax.swing.JFrame
 	public MainView()
 	{
 		initComponents();
+		loginButton.setVisible( false );
+		passwordTextField.setVisible( false );
+		loginButton.setVisible( false );
+		passwordLabel.setVisible( false );
+		loginLabel.setVisible( false );
+		loginTextField.setVisible( false );
+		this.setSize( 100, 100 );
+		this.repaint();
 	}
 
 	/**
@@ -27,21 +35,103 @@ public class MainView extends javax.swing.JFrame
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        connectButton = new javax.swing.JButton();
+        addressTextField = new javax.swing.JTextField();
+        loginTextField = new javax.swing.JTextField();
+        loginButton = new javax.swing.JButton();
+        serverAddressLabel = new javax.swing.JLabel();
+        loginLabel = new javax.swing.JLabel();
+        passwordLabel = new javax.swing.JLabel();
+        passwordTextField = new javax.swing.JPasswordField();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        connectButton.setText("Połącz");
+        connectButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                connectAction(evt);
+            }
+        });
+
+        addressTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        addressTextField.setToolTipText("");
+        addressTextField.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+
+        loginTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        loginTextField.setToolTipText("");
+        loginTextField.setMinimumSize(new java.awt.Dimension(150, 22));
+        loginTextField.setPreferredSize(new java.awt.Dimension(150, 22));
+
+        loginButton.setText("Zaloguj");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginAction(evt);
+            }
+        });
+
+        serverAddressLabel.setText("Adres serwera");
+
+        loginLabel.setText("Login");
+
+        passwordLabel.setText("Haslo");
+
+        passwordTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        passwordTextField.setMinimumSize(new java.awt.Dimension(200, 22));
+        passwordTextField.setPreferredSize(new java.awt.Dimension(200, 22));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(serverAddressLabel))
+                    .addComponent(passwordLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(loginLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addressTextField)
+                    .addComponent(loginTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                    .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
+                .addContainerGap(145, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serverAddressLabel)
+                    .addComponent(addressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(connectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loginTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(loginLabel))
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(passwordLabel)
+                    .addComponent(passwordTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+	private void connectAction( java.awt.event.ActionEvent evt )//GEN-FIRST:event_connectAction
+	{//GEN-HEADEREND:event_connectAction
+	}//GEN-LAST:event_connectAction
+
+	private void loginAction( java.awt.event.ActionEvent evt )//GEN-FIRST:event_loginAction
+	{//GEN-HEADEREND:event_loginAction
+		// TODO add your handling code here:
+	}//GEN-LAST:event_loginAction
 
 	/**
 	 * @param args the command line arguments
@@ -99,5 +189,13 @@ public class MainView extends javax.swing.JFrame
 		} );
 	}
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField addressTextField;
+    private javax.swing.JButton connectButton;
+    private javax.swing.JButton loginButton;
+    private javax.swing.JLabel loginLabel;
+    private javax.swing.JTextField loginTextField;
+    private javax.swing.JLabel passwordLabel;
+    private javax.swing.JPasswordField passwordTextField;
+    private javax.swing.JLabel serverAddressLabel;
     // End of variables declaration//GEN-END:variables
 }
