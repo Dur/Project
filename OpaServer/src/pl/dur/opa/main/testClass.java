@@ -30,7 +30,8 @@ public class testClass
 		
 		//LocalFileAdministrator kopia = new LocalFileAdministrator( new File( "C:\\" ), "kopia.iso" );
 		File file = new File("D:\\Gry\\ac.iso");
-		System.out.println(Files.getChecksum( file, new java.util.zip.CRC32() ));
+//		System.out.println(Files.getChecksum( file, new java.util.zip.CRC32() ));
+		System.out.println(file.getPath());
 //		File fileToSend = fileAdmin.getFile();
 //		FileOutputStream stream = null;
 //		BufferedInputStream input = null;

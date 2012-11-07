@@ -1,19 +1,19 @@
 package pl.dur.opa.view;
 
-import com.google.common.io.Files;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.*;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.text.*;
 import java.util.List;
+import pl.dur.opa.file.browser.ExtendedFileSystemView;
+import pl.dur.opa.utils.ExtendedFile;
 
 public class View extends JPanel implements ActionListener
 {
@@ -28,13 +28,13 @@ public class View extends JPanel implements ActionListener
 	public View()
 	{
 		super( new BorderLayout() );
-
-		fc = new JFileChooser();
+		File[] roots = new File[ 1 ];
+		roots[0] = new ExtendedFile( "C:\\");
+		fc = new JFileChooser( new ExtendedFileSystemView( roots, new File("C:\\") ) );
 		fc.setMultiSelectionEnabled( true );
 		fc.setDragEnabled( true );
 		fc.setControlButtonsAreShown( false );
 		fc.setFileSelectionMode( JFileChooser.FILES_ONLY );
-
 
 		JPanel fcPanel = new JPanel( new BorderLayout() );
 		fcPanel.add( fc, BorderLayout.CENTER );
@@ -55,11 +55,11 @@ public class View extends JPanel implements ActionListener
 
 		listModel = new DefaultListModel();
 		dropZone = new JList( listModel );
-		dropZone.setCellRenderer( new FileCellRenderer() );
+		dropZone.setCellRenderer( new ExtendedFileCellRenderer() );
 		dropZone.setTransferHandler( new ListTransferHandler( dropZone ) );
 		dropZone.setDragEnabled( true );
 		dropZone.setDropMode( javax.swing.DropMode.INSERT );
-		dropZone.setBorder( new TitledBorder( "Files to send" ) );
+		dropZone.setBorder( new TitledBorder( "ExtendedFiles to send" ) );
 		leftLowerPanel.setViewportView( new JScrollPane( dropZone ) );
 
 		splitPane = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
@@ -75,7 +75,6 @@ public class View extends JPanel implements ActionListener
 //	{
 //		getRootPane().setDefaultButton( clear );
 //	}
-
 	public void actionPerformed( ActionEvent e )
 	{
 		if( e.getSource() == clear )
@@ -137,7 +136,7 @@ public class View extends JPanel implements ActionListener
 	}
 }
 
-class FileCellRenderer extends DefaultListCellRenderer
+class ExtendedFileCellRenderer extends DefaultListCellRenderer
 {
 	public Component getListCellRendererComponent( JList list,
 			Object value,
@@ -153,7 +152,15 @@ class FileCellRenderer extends DefaultListCellRenderer
 		{
 			JLabel l = (JLabel) c;
 			File f = (File) value;
-			l.setIcon( FileSystemView.getFileSystemView().getSystemIcon( f ) );
+			ImageIcon icon = new ImageIcon( "icons//fileOk.jpg" ) {};
+			if( f.isFile() )
+			{
+				l.setIcon( icon );
+			}
+			else
+			{
+				l.setIcon( FileSystemView.getFileSystemView().getSystemIcon( f ) );
+			}
 			l.setText( f.getName() );
 			l.setToolTipText( f.getAbsolutePath() );
 		}
@@ -173,7 +180,7 @@ class ListTransferHandler extends TransferHandler
 	@Override
 	public boolean canImport( TransferHandler.TransferSupport info )
 	{
-		// we only import FileList
+		// we only import ExtendedFileList
 		if( !info.isDataFlavorSupported( DataFlavor.javaFileListFlavor ) )
 		{
 			return false;
@@ -189,7 +196,7 @@ class ListTransferHandler extends TransferHandler
 			return false;
 		}
 
-		// Check for FileList flavor
+		// Check for ExtendedFileList flavor
 		if( !info.isDataFlavorSupported( DataFlavor.javaFileListFlavor ) )
 		{
 			displayDropLocation( "List doesn't accept a drop of this type." );
@@ -202,9 +209,19 @@ class ListTransferHandler extends TransferHandler
 		try
 		{
 			data = (List<File>) t.getTransferData( DataFlavor.javaFileListFlavor );
+			List<File> cantTransfer = new ArrayList<>();
+			for( File file : data )
+			{
+				if( file.isDirectory() )
+				{
+					cantTransfer.add( file );
+				}
+			}
+			data.removeAll( cantTransfer );
 		}
 		catch( Exception e )
 		{
+			e.printStackTrace();
 			return false;
 		}
 		DefaultListModel model = (DefaultListModel) list.getModel();
