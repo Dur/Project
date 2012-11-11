@@ -13,8 +13,9 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 /**
- * Class which reads configuration file and updates server dependencies. Configuration file can be updated befor server start. To reconfigure the server by this file
- * server must be restarted.
+ * Class which reads configuration file and updates server dependencies.
+ * Configuration file can be updated befor server start. To reconfigure the
+ * server by this file server must be restarted.
  *
  * @author Dur
  */
@@ -30,7 +31,6 @@ public class Configuration
 
 	public final void reconfigureServer()
 	{
-		System.out.println( "configure" );
 		File configurationFile = new File( "conf//server.conf" );
 		if( !configurationFile.canRead() )
 		{
@@ -74,5 +74,10 @@ public class Configuration
 			isConfFile = false;
 			return;
 		}
+	}
+
+	public String getParameter( String key )
+	{
+		return params.get( key );
 	}
 }

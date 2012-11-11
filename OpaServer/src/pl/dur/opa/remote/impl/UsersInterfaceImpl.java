@@ -7,8 +7,11 @@ package pl.dur.opa.remote.impl;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import pl.dur.opa.connection.ConnectionAdministrator;
-import pl.dur.opa.remote.interfaces.FileManipulator;
+import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.remote.interfaces.UsersInterface;
+import pl.dur.opa.utils.ExtendedFile;
 
 /**
  * Class implements file manipulator interface. Methods in this class are
@@ -16,16 +19,25 @@ import pl.dur.opa.remote.interfaces.FileManipulator;
  *
  * @author Dur
  */
-public class FileManipulatorImpl extends UnicastRemoteObject implements FileManipulator
+public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInterface
 {
 	private ConnectionAdministrator connectionAdmin;
-
+	
+	private LocalFileAdministrator filesAdministrator;
+	
+	private File userHomeDirectory;
 	/**
 	 * Constructor.
 	 */
-	public FileManipulatorImpl() throws RemoteException
+	public UsersInterfaceImpl(File usersHome, LocalFileAdministrator fileAdmin ) throws RemoteException
 	{
 		connectionAdmin = new ConnectionAdministrator();
+		this.userHomeDirectory = usersHome;
+		if( ! userHomeDirectory.exists() )
+		{
+			userHomeDirectory.mkdirs();
+		}
+		this.filesAdministrator = fileAdmin;
 	}
 
 	@Override
@@ -48,6 +60,12 @@ public class FileManipulatorImpl extends UnicastRemoteObject implements FileMani
 
 	@Override
 	public final String saveFiles( final File directory ) throws RemoteException
+	{
+		throw new UnsupportedOperationException( "Not supported yet." );
+	}
+
+	@Override
+	public List<ExtendedFile> checkFilesBackups( List<ExtendedFile> filesToCheck ) throws RemoteException
 	{
 		throw new UnsupportedOperationException( "Not supported yet." );
 	}

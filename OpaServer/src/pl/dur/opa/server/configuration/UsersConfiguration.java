@@ -11,11 +11,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-import pl.dur.opa.file.browser.LocalFileAdministrator;
 
 /**
- * Class which reads configuration file and updates server dependencies. Configuration file can be updated befor server start. To reconfigure the server by this file
- * server must be restarted.
+ * Class which reads configuration file and updates server dependencies.
+ * Configuration file can be updated befor server start. To reconfigure the
+ * server by this file server must be restarted.
  *
  * @author Dur
  */
@@ -31,9 +31,16 @@ public class UsersConfiguration
 	public final void readRegisteredUsers()
 	{
 		File configurationFile = new File( "conf//users.conf" );
-		if( ! configurationFile.exists() )
+		if( !configurationFile.exists() )
 		{
-			LocalFileAdministrator admin = new LocalFileAdministrator( configurationFile );
+			try
+			{
+				configurationFile.createNewFile();
+			}
+			catch( IOException ex )
+			{
+				ex.printStackTrace();
+			}
 			return;
 		}
 		try
@@ -71,9 +78,16 @@ public class UsersConfiguration
 			return;
 		}
 	}
-	
-	public String getUser( String login )
+
+	public boolean checkCredentials( String login, String password )
 	{
-		return users.get( login );
+		if( users.get( login ) != null && users.get( login ).equals( password ) )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

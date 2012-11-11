@@ -9,9 +9,8 @@ import java.rmi.RMISecurityManager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import pl.dur.opa.connection.ConnectionAccepter;
-import pl.dur.opa.remote.impl.FileManipulatorImpl;
 import pl.dur.opa.remote.impl.RemoteFileSystemViewImpl;
-import pl.dur.opa.remote.interfaces.FileManipulator;
+import pl.dur.opa.remote.impl.UserAuthenticatorImpl;
 import pl.dur.opa.server.configuration.Configuration;
 import pl.dur.opa.server.configuration.UsersConfiguration;
 
@@ -39,17 +38,21 @@ public final class OpaServer
 		try
 		{
 			Configuration conf = new Configuration();
-			File root = new File("C:\\");
+			
+			File root = new File(conf.getParameter( "ROOT") );
 			File[] roots = new File[1];
 			roots[0]=root;
+			UsersConfiguration users = new UsersConfiguration();
 			RemoteFileSystemViewImpl fileView = new RemoteFileSystemViewImpl( roots, root );
-			FileManipulatorImpl manipulator = new FileManipulatorImpl();
+			UserAuthenticatorImpl authenticator = new UserAuthenticatorImpl( users, root );
 			Registry registry = LocateRegistry.createRegistry( 1099 );
 			registry.rebind( "FILE_VIEW", fileView );
-			registry.rebind( "MANIPULATOR", manipulator);
+			registry.rebind( "AUTH", authenticator);
+			
 			Thread connectionListener = new Thread( new ConnectionAccepter( 80 ) );
 			connectionListener.start();
-			UsersConfiguration users = new UsersConfiguration();
+			
+			
 		}
 		catch( Exception x )
 		{

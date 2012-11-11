@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
  * Client calls methods of this class to make some operations of files located on server.
  * @author Dur
  */
-public interface FileManipulator extends Remote
+public interface UsersInterface extends Remote
 {
 	/**
 	 * Returns String which is a key to send back by socket.

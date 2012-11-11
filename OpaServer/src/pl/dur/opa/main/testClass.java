@@ -4,10 +4,10 @@
  */
 package pl.dur.opa.main;
 
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
-import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.tasks.SaveFileDescriptorTask;
+import pl.dur.opa.tasks.TaskExecutor;
 
 /**
  *
@@ -27,11 +27,19 @@ public class testClass
 //		fileAdmin.appendToFile( "test".getBytes() );
 //		fileAdmin.appendToFile( "test".getBytes() );
 //		fileAdmin.appendToFile( "test".getBytes() );
-		
+
 		//LocalFileAdministrator kopia = new LocalFileAdministrator( new File( "C:\\" ), "kopia.iso" );
-		File file = new File("D:\\Gry\\ac.iso");
+		File file = new File( "D:\\Gry\\Brood_War.ISO" );
+		File conf = new File( "C:\\log.txt" );
+		System.out.println(file.getParent());
+//		for( int a = 1; a < 20; a++ )
+//		{
+//			TaskExecutor ex = new TaskExecutor( new SaveFileDescriptorTask( file, conf ) );
+//			Thread th = new Thread( ex );
+//			th.start();
+//		}
+
 //		System.out.println(Files.getChecksum( file, new java.util.zip.CRC32() ));
-		System.out.println(file.getPath());
 //		File fileToSend = fileAdmin.getFile();
 //		FileOutputStream stream = null;
 //		BufferedInputStream input = null;
@@ -58,6 +66,6 @@ public class testClass
 //		{
 //			ex.printStackTrace();
 //		}
-			
+
 	}
 }

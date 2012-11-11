@@ -1,16 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dur.opa.file.browser;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.StringTokenizer;
+import pl.dur.opa.utils.ExtendedFile;
 
 /**
  *
@@ -18,87 +13,100 @@ import java.util.logging.Logger;
  */
 public class LocalFileAdministrator
 {
-	private File selectedFile;
+	private File filesList;
+	private File homeDirectory;
+	private HashMap<String, List<ExtendedFile>> filesTree = new HashMap<>();
 
-	public LocalFileAdministrator( File file )
+	public LocalFileAdministrator( File homeDirectory, String userLogin, boolean flag )
 	{
-		selectedFile = file;
-		if( !selectedFile.exists() )
+		this.homeDirectory = homeDirectory;
+		filesList = new File( homeDirectory + File.separator + userLogin + ".flf" );
+		if( !filesList.exists() )
 		{
 			try
 			{
-				selectedFile.createNewFile();
+				filesList.createNewFile();
 			}
 			catch( IOException ex )
 			{
-				Logger.getLogger( LocalFileAdministrator.class.getName() ).
-						log( Level.SEVERE, null, ex );
+				ex.printStackTrace();
 			}
+		}
+		else
+		{
+			constructTreeOfFiles();
 		}
 	}
 
-	public LocalFileAdministrator( File directory, String newFileName )
+	private void constructTreeOfFiles()
 	{
-		selectedFile = null;
+		ExtendedFile currentFile;
 		try
 		{
-			selectedFile = new File( "C:" + File.separator + "copies" + File.separator + newFileName );
-			if( !selectedFile.exists() )
+			FileReader inFile = new FileReader( filesList );
+			BufferedReader reader = new BufferedReader( inFile );
+			String line;
+			String filePath;
+			String CRC;
+			StringTokenizer tokenizer;
+
+			ExtendedFile temp = new ExtendedFile( homeDirectory + File.separator + "temp.tmp" );
+			
+			PrintStream stream = new PrintStream( temp );
+			while( (line = reader.readLine()) != null )
 			{
-				selectedFile.createNewFile();
+				tokenizer = new StringTokenizer( line, " " );
+				filePath = tokenizer.nextToken().trim();
+				CRC = tokenizer.nextToken().trim();
+				currentFile = new ExtendedFile( filePath, Long.parseLong( CRC ) );
+				if( currentFile.exists() )
+				{
+					putFileIntoFilesMap( currentFile );
+					stream.println( line );
+				}
 			}
-		}
-		catch( IOException ex )
-		{
-			ex.printStackTrace();
-		}
-	}
-
-	public LocalFileAdministrator( String path )
-	{
-		selectedFile = new File( path );
-	}
-
-	public boolean writeToFile( byte[] data )
-	{
-		FileWriter fstream = null;
-		try
-		{
-			fstream = new FileWriter( selectedFile );
-			BufferedWriter out = new BufferedWriter( fstream );
-			out.write( new String( data ) );
-			out.close();
+			reader.close();
+			stream.close();
+		//	FileUtils.copyFile( temp, filesList);
+		//	temp.delete();
 		}
 		catch( FileNotFoundException ex )
 		{
 			ex.printStackTrace();
 		}
-		catch( IOException ex )
+		catch( IOException iex )
+		{
+			iex.printStackTrace();
+		}
+		catch (Exception ex )
 		{
 			ex.printStackTrace();
 		}
-		return true;
 	}
 
-	public boolean appendToFile( byte[] data )
+	private void putFileIntoFilesMap( ExtendedFile fileToPut )
 	{
-		FileWriter fstream = null;
-		try
+		List<ExtendedFile> files;
+		if(  ( files = filesTree.get( fileToPut.getName() ) ) != null )
 		{
-			fstream = new FileWriter( selectedFile, true );
-			BufferedWriter out = new BufferedWriter( fstream );
-			out.append( new String( data ) );
-			out.close();
+			files.add( fileToPut );
 		}
-		catch( IOException ex )
+		else
 		{
-			ex.printStackTrace();
+			files = new ArrayList<>();
+			files.add( fileToPut );
+			filesTree.put( fileToPut.getName(), files );
 		}
-		return true;
 	}
-
-	public File getFile()
+	
+	public void listFiles()
 	{
-		return selectedFile;
+		for( List<ExtendedFile> files : filesTree.values() )
+		{
+			for( ExtendedFile file : files )
+			{
+				System.out.println(file.getPath() + " " + file.getFileCheckSum() );
+			}
+		}
 	}
 }

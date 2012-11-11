@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.utils.ExtendedFile;
 
 /**
  * Class to wrapp socket and make some operations on it. It can send files ad
@@ -20,7 +21,6 @@ import pl.dur.opa.file.browser.LocalFileAdministrator;
 public class SocketWrapper
 {
 	private Socket client;
-	private LocalFileAdministrator fileAdmin;
 	private final static int PACKAGE_SIZE = 1024;
 	private final static int NO_DATA = -1;
 
@@ -45,10 +45,10 @@ public class SocketWrapper
 	{
 		try
 		{
-			fileAdmin = new LocalFileAdministrator( directory, name );
+			ExtendedFile file = new ExtendedFile( directory.getPath() + File.separator + name );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			int len = 0;
-			FileOutputStream inFile = new FileOutputStream( fileAdmin.getFile() );
+			FileOutputStream inFile = new FileOutputStream( file );
 			InputStream is = client.getInputStream();
 			BufferedInputStream bufferedInput = new BufferedInputStream( is, PACKAGE_SIZE );
 			while( (len = bufferedInput.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
@@ -68,8 +68,7 @@ public class SocketWrapper
 	{
 		try
 		{
-			fileAdmin = new LocalFileAdministrator( file );
-			File fileToSend = fileAdmin.getFile();
+			ExtendedFile fileToSend = new ExtendedFile( file.getPath() );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			OutputStream os = client.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream( os, PACKAGE_SIZE );

@@ -8,8 +8,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import javax.swing.JFileChooser;
 import pl.dur.opa.file.browser.RemoteFileBrowser;
-import pl.dur.opa.remote.interfaces.FileManipulator;
+import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
+import pl.dur.opa.remote.interfaces.UserAuthenticator;
 import pl.dur.opa.tasks.ReceiveFileTask;
 import pl.dur.opa.tasks.SendFileTask;
 import pl.dur.opa.tasks.TaskExecutor;
@@ -38,17 +39,17 @@ public final class OpaClient
 			}
 			RemoteFileBrowser fileBrowser = new RemoteFileBrowser( server );
 			
- 			Remote remoteManipulator = registry.lookup( "MANIPULATOR" );
-			FileManipulator mnipulator = null;
-			if( remoteManipulator instanceof FileManipulator )
+ 			remote = registry.lookup( "AUTH" );
+			UserAuthenticator auth = null;
+			if( remote instanceof UserAuthenticator )
 			{
-				mnipulator = (FileManipulator) remoteManipulator;
+				auth = (UserAuthenticator) remote;
 			}
-			
+			UsersInterface manipulator = auth.loginUser( "mmk", "mmk");
 			JFileChooser chooser = new JFileChooser( fileBrowser );
 			chooser.showOpenDialog( null );
 			File file = chooser.getSelectedFile();
-			String key = mnipulator.getFile( file );
+			String key = manipulator.getFile( file );
 			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( file, key, file.getName(), 
 														"localhost", 80) );
 			Thread thread = new Thread(executor);
@@ -57,7 +58,7 @@ public final class OpaClient
 			chooser = new JFileChooser( );
 			chooser.showOpenDialog( null );
 			file = chooser.getSelectedFile();
-			key = mnipulator.saveFile( file, file.getName() );
+			key = manipulator.saveFile( file, file.getName() );
 			executor = new TaskExecutor( new SendFileTask( file, 80, "localhost", key) );
 			thread = new Thread(executor);
 			thread.start();
