@@ -22,6 +22,12 @@ public class ExtendedFile extends File
 	
 	private boolean isStored;
 	
+	public ExtendedFile( String pathName, Long CRC )
+	{
+		super( pathName );
+		this.fileCheckSum = CRC.longValue();
+	}
+	
 	public ExtendedFile( String pathname )
 	{
 		super( pathname );
@@ -82,6 +88,32 @@ public class ExtendedFile extends File
 		this.isStored = isStored;
 	}
 	
-	
+	@Override
+	public boolean equals(Object second )
+	{
+		if( ! ( second instanceof ExtendedFile ) )
+		{
+			return false;
+		}
+		else
+		{
+			ExtendedFile toCompare = (ExtendedFile) second; 
+			if( ! (this.getName().equals( toCompare.getName() ) ) )
+			{
+				return false;
+			}
+			else
+			{
+				if( ( this.getFileCheckSum() != 0 ) && ( toCompare.getFileCheckSum() != 0 ) )
+				{
+					return this.getFileCheckSum() == toCompare.getFileCheckSum();
+				}
+				else
+				{
+					return ( ( this.length() == toCompare.length() ) && ( this.lastModified() == toCompare.lastModified() ) );
+				}
+			}
+		}
+	}
 	
 }

@@ -8,13 +8,7 @@ package pl.dur.opa.client.actions;
  *
  * @author Dur
  */
-public class GetFileAction implements Action
+public interface Action
 {
-
-	@Override
-	public Object execute()
-	{
-		throw new UnsupportedOperationException( "Not supported yet." );
-	}
-	
+	Object execute();
 }

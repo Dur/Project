@@ -5,11 +5,9 @@
 package pl.dur.opa.tasks;
 
 import com.google.common.io.Files;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.utils.ExtendedFile;
 
 /**
  * Task which writes to text file all informations about file which is passed to
@@ -19,8 +17,8 @@ import java.nio.channels.FileChannel;
  */
 public class SaveFileDescriptorTask implements Task
 {
-	private File savedFile;
-	private File config;
+	private ExtendedFile savedFile;
+	private LocalFileAdministrator fileAdmin;
 
 	/**
 	 * Constructor.
@@ -29,21 +27,10 @@ public class SaveFileDescriptorTask implements Task
 	 * @param configurationFile - file which contains all informationns about
 	 * all files assignned to specify user.
 	 */
-	public SaveFileDescriptorTask( File file, File configurationFile )
+	public SaveFileDescriptorTask( ExtendedFile file, LocalFileAdministrator fileAdmin )
 	{
 		this.savedFile = file;
-		this.config = configurationFile;
-		if( !config.exists() )
-		{
-			try
-			{
-				config.createNewFile();
-			}
-			catch( IOException ex )
-			{
-				ex.printStackTrace();
-			}
-		}
+		this.fileAdmin = fileAdmin;
 	}
 
 	@Override
@@ -51,13 +38,10 @@ public class SaveFileDescriptorTask implements Task
 	{
 		try
 		{
+			System.out.println("Calculating crc");
 			Long CRC = Files.getChecksum( savedFile, new java.util.zip.CRC32() );
-			String input = savedFile.getPath() + " " + CRC + "\n";
-			ByteBuffer bbuf = ByteBuffer.wrap( input.getBytes() );
-			FileChannel wChannel = new FileOutputStream( config, true ).
-					getChannel();
-			wChannel.write( bbuf );
-			wChannel.close();
+			String input = savedFile.getPath() + ";" + CRC + "\n";
+			fileAdmin.addNewFileToServer( input, savedFile );
 		}
 		catch( IOException ex )
 		{

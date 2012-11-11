@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.tasks.SaveFileDescriptorTask;
+import pl.dur.opa.tasks.TaskExecutor;
 import pl.dur.opa.utils.ExtendedFile;
 
 /**
@@ -41,7 +43,7 @@ public class SocketWrapper
 	 * @param name - name of file.
 	 * @param directory - directory where selected file should be stored.
 	 */
-	public void receiveFile( String name, File directory )
+	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin )
 	{
 		try
 		{
@@ -57,6 +59,10 @@ public class SocketWrapper
 			}
 			client.close();
 			inFile.close();
+			System.out.println("Befor calculating crc");
+			TaskExecutor executor = new TaskExecutor( new SaveFileDescriptorTask( file, fileAdmin ) );
+			Thread thread = new Thread(executor);
+			thread.start();
 		}
 		catch( IOException ex )
 		{

@@ -4,17 +4,21 @@
  */
 package pl.dur.opa.view;
 
+import pl.dur.opa.controllers.ClientController;
+
 /**
  *
  * @author Dur
  */
 public class LoggingPage extends javax.swing.JFrame
 {
+	private ClientController controller;
 	/**
 	 * Creates new form LoggingPage
 	 */
-	public LoggingPage()
+	public LoggingPage(ClientController controller )
 	{
+		this.controller = controller;
 		initComponents();
 	}
 
@@ -27,81 +31,129 @@ public class LoggingPage extends javax.swing.JFrame
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTextField2 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        loginTF = new javax.swing.JTextField();
+        ServerAddressTF = new javax.swing.JTextField();
+        passwordTF = new javax.swing.JPasswordField();
+        serverAddresL = new javax.swing.JLabel();
+        loginL = new javax.swing.JLabel();
+        passwordL = new javax.swing.JLabel();
+        loginButton = new javax.swing.JButton();
+        tekstL = new javax.swing.JLabel();
+
+        jTextField2.setText("jTextField2");
+
+        jButton1.setText("jButton1");
+
+        jLabel1.setText("jLabel1");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        loginTF.setText("ddr");
+
+        ServerAddressTF.setText("localhost");
+
+        passwordTF.setText("ddr");
+
+        serverAddresL.setText("Server Address");
+
+        loginL.setText("Login");
+
+        passwordL.setText("Password");
+
+        loginButton.setText("Log In");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onLoginAction(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tekstL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(loginTF)
+                                    .addComponent(ServerAddressTF)
+                                    .addComponent(passwordTF, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(serverAddresL)
+                                    .addComponent(passwordL)
+                                    .addComponent(loginL)))
+                            .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 45, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(42, 42, 42)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ServerAddressTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(serverAddresL))
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loginTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(loginL))
+                .addGap(29, 29, 29)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(passwordTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(passwordL))
+                .addGap(18, 18, 18)
+                .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(tekstL, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main( String args[] )
-	{
-		/*
-		 * Set the Nimbus look and feel
-		 */
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-		 * If Nimbus (introduced in Java SE 6) is not available, stay with the
-		 * default look and feel. For details see
-		 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-		 */
-		try
+	private void onLoginAction( java.awt.event.ActionEvent evt )//GEN-FIRST:event_onLoginAction
+	{//GEN-HEADEREND:event_onLoginAction
+		char[] pass = passwordTF.getPassword();
+		String password = String.valueOf( pass );
+		System.out.println("logging action");
+		if( ServerAddressTF.getText().length() == 0 || loginTF.getText().length() == 0 || password.
+				length() == 0 )
 		{
-			for( javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.
-					getInstalledLookAndFeels() )
+			tekstL.setText( "You must specify all informations to connect to server " );
+		}
+		else
+		{
+			tekstL.setText( "" );
+			if( controller.connectToServer( loginTF.getText(), password, ServerAddressTF.getText()) == true )
 			{
-				if( "Nimbus".equals( info.getName() ) )
-				{
-					javax.swing.UIManager.setLookAndFeel( info.getClassName() );
-					break;
-				}
+				this.setVisible( false );
+				this.dispose();
+			}
+			else
+			{
+				tekstL.setText( "Could not connect to server" );
 			}
 		}
-		catch( ClassNotFoundException ex )
-		{
-			java.util.logging.Logger.getLogger( LoggingPage.class.getName() ).
-					log( java.util.logging.Level.SEVERE, null, ex );
-		}
-		catch( InstantiationException ex )
-		{
-			java.util.logging.Logger.getLogger( LoggingPage.class.getName() ).
-					log( java.util.logging.Level.SEVERE, null, ex );
-		}
-		catch( IllegalAccessException ex )
-		{
-			java.util.logging.Logger.getLogger( LoggingPage.class.getName() ).
-					log( java.util.logging.Level.SEVERE, null, ex );
-		}
-		catch( javax.swing.UnsupportedLookAndFeelException ex )
-		{
-			java.util.logging.Logger.getLogger( LoggingPage.class.getName() ).
-					log( java.util.logging.Level.SEVERE, null, ex );
-		}
-		//</editor-fold>
-
-		/*
-		 * Create and display the form
-		 */
-		java.awt.EventQueue.invokeLater( new Runnable()
-		{
-			public void run()
-			{
-				new LoggingPage().setVisible( true );
-			}
-		} );
-	}
+	}//GEN-LAST:event_onLoginAction
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField ServerAddressTF;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JButton loginButton;
+    private javax.swing.JLabel loginL;
+    private javax.swing.JTextField loginTF;
+    private javax.swing.JLabel passwordL;
+    private javax.swing.JPasswordField passwordTF;
+    private javax.swing.JLabel serverAddresL;
+    private javax.swing.JLabel tekstL;
     // End of variables declaration//GEN-END:variables
 }

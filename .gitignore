@@ -2,3 +2,5 @@
 /OpaServer/nbproject/private/
 /OpaServer/build/
 /OpaClient/build/
+/OpaClient/dist/
+/OpaServer/dist/

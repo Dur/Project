@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dur.opa.main;
 
 import java.io.File;
@@ -40,19 +36,13 @@ public final class OpaServer
 			Configuration conf = new Configuration();
 			
 			File root = new File(conf.getParameter( "ROOT") );
-			File[] roots = new File[1];
-			roots[0]=root;
 			UsersConfiguration users = new UsersConfiguration();
-			RemoteFileSystemViewImpl fileView = new RemoteFileSystemViewImpl( roots, root );
 			UserAuthenticatorImpl authenticator = new UserAuthenticatorImpl( users, root );
 			Registry registry = LocateRegistry.createRegistry( 1099 );
-			registry.rebind( "FILE_VIEW", fileView );
 			registry.rebind( "AUTH", authenticator);
 			
 			Thread connectionListener = new Thread( new ConnectionAccepter( 80 ) );
 			connectionListener.start();
-			
-			
 		}
 		catch( Exception x )
 		{

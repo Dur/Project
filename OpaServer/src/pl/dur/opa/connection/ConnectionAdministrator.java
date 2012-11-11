@@ -6,6 +6,7 @@ package pl.dur.opa.connection;
 
 import java.io.File;
 import java.util.Random;
+import pl.dur.opa.file.browser.LocalFileAdministrator;
 import pl.dur.opa.tasks.ReceiveFileTask;
 import pl.dur.opa.tasks.SendFileTask;
 
@@ -24,10 +25,10 @@ public class ConnectionAdministrator
 		return taskKey;
 	}
 
-	public String getSocketForFileReceiving( File directory, String name )
+	public String getSocketForFileReceiving( File directory, String name, LocalFileAdministrator fileAdmin )
 	{
 		String taskKey = generateRandomString();
-		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name ) );
+		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name, fileAdmin ) );
 		return taskKey;
 	}
 

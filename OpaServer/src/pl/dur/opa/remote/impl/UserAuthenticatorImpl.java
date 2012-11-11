@@ -31,9 +31,12 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 	{
 		if( users.checkCredentials( username, password ) == true )
 		{
-			File usersHome = new File( rootDirectory + File.separator + username);
+			File usersHome = new File( rootDirectory + File.separator + username );
 			LocalFileAdministrator fileAdmin = new LocalFileAdministrator( usersHome, username, true );
-			manipulator = new UsersInterfaceImpl(usersHome, fileAdmin );
+			File[] roots = new File[1];
+			roots[0] = fileAdmin.getHomeDir();
+			RemoteFileSystemViewImpl filesView = new RemoteFileSystemViewImpl( roots, roots[0] );
+			manipulator = new UsersInterfaceImpl(fileAdmin.getHomeDir(), fileAdmin, filesView );
 			fileAdmin.listFiles();
 			return manipulator;
 		}

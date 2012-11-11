@@ -6,14 +6,10 @@ package pl.dur.opa.remote.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.MessageFormat;
 import javax.swing.filechooser.FileSystemView;
-import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
 import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
 
 /**

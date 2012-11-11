@@ -6,8 +6,6 @@ package pl.dur.opa.main;
 
 import java.io.File;
 import java.io.IOException;
-import pl.dur.opa.tasks.SaveFileDescriptorTask;
-import pl.dur.opa.tasks.TaskExecutor;
 
 /**
  *
