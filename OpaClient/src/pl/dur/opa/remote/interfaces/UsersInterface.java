@@ -69,7 +69,7 @@ public interface UsersInterface extends Remote
 	 * @return same list with info.
 	 * @throws RemoteException
 	 */
-	List<ExtendedFile> checkFilesBackups( List<ExtendedFile> filesToCheck ) throws RemoteException;
+	ExtendedFile[] checkFilesBackups( ExtendedFile[] filesToCheck ) throws RemoteException;
 
 	void removeFileFromServer( ExtendedFile file ) throws RemoteException;
 

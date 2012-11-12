@@ -10,12 +10,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import pl.dur.opa.client.actions.Action;
 import pl.dur.opa.file.browser.RemoteFileBrowser;
 import pl.dur.opa.remote.interfaces.UserAuthenticator;
 import pl.dur.opa.remote.interfaces.UsersInterface;
@@ -35,6 +33,7 @@ public class ClientController
 	private LoggingPage loggingPage;
 	private View view;
 	private UsersInterface manipulator;
+	private String serverAddress = "";
 
 	public ClientController()
 	{
@@ -43,9 +42,10 @@ public class ClientController
 
 	public boolean connectToServer( String login, String password, String serverAddress )
 	{
+		this.serverAddress = serverAddress;
 		try
 		{
-			Registry registry = LocateRegistry.getRegistry( serverAddress );
+			Registry registry = LocateRegistry.getRegistry( serverAddress, 1099 );
 			Remote remote = registry.lookup( "AUTH" );
 			UserAuthenticator auth = null;
 			if( remote instanceof UserAuthenticator )
@@ -69,37 +69,51 @@ public class ClientController
 		return true;
 	}
 
-	public RemoteFileBrowser getRemoteFileBrowser()
+	public void sendFile( File serverDirectory, File file )
 	{
-		RemoteFileBrowser fileBrowser = null;
+		String key;
 		try
 		{
-			fileBrowser = new RemoteFileBrowser( manipulator.getFileSystemView() );
-			JFileChooser chooser = new JFileChooser( fileBrowser );
-			chooser.showOpenDialog( null );
-			File file = chooser.getSelectedFile();
-			String key = manipulator.getFile( file );
-			File inputDir = new File( file.getParent() );
-			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( inputDir, key, file.
-					getName(),
-					"localhost", 80 ) );
+			key = manipulator.saveFile( serverDirectory, file.getName() );
+			TaskExecutor executor = new TaskExecutor( new SendFileTask( file, 80, serverAddress, key ) );
 			Thread thread = new Thread( executor );
-			thread.start();
-			manipulator.removeFileFromServer( new ExtendedFile( file.getPath() ) );
-
-			chooser = new JFileChooser();
-			chooser.showOpenDialog( null );
-			file = chooser.getSelectedFile();
-			key = manipulator.saveFile( inputDir, file.getName() );
-			executor = new TaskExecutor( new SendFileTask( file, 80, "localhost", key ) );
-			thread = new Thread( executor );
 			thread.start();
 		}
 		catch( RemoteException ex )
 		{
 			ex.printStackTrace();
 		}
-		return fileBrowser;
+
+	}
+
+	public void receiveFile( File localDirectory, File remoteFile )
+	{
+		try
+		{
+			String key = manipulator.getFile( remoteFile );
+			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( localDirectory, key, remoteFile.
+					getName(),
+					serverAddress, 80 ) );
+			Thread thread = new Thread( executor );
+			thread.start();
+		}
+		catch( RemoteException ex )
+		{
+			ex.printStackTrace();
+		}
+	}
+
+	public ExtendedFile[] areFilesVersioned( ExtendedFile[] files )
+	{
+		try
+		{
+			files = manipulator.checkFilesBackups( files );
+		}
+		catch( RemoteException ex )
+		{
+			ex.printStackTrace();
+		}
+		return files;
 	}
 
 	public LoggingPage getLoggingPage()
@@ -131,6 +145,4 @@ public class ClientController
 	{
 		this.manipulator = manipulator;
 	}
-	
-	
 }

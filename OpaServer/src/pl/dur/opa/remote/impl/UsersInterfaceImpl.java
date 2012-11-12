@@ -67,7 +67,7 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 	}
 
 	@Override
-	public List<ExtendedFile> checkFilesBackups( List<ExtendedFile> filesToCheck ) throws RemoteException
+	public ExtendedFile[] checkFilesBackups( ExtendedFile[] filesToCheck ) throws RemoteException
 	{
 		for( ExtendedFile file : filesToCheck )
 		{

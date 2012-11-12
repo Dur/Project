@@ -8,9 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
+import pl.dur.opa.controllers.ClientController;
 import pl.dur.opa.utils.ExtendedFile;
 
 /**
@@ -23,10 +22,8 @@ import pl.dur.opa.utils.ExtendedFile;
 public class ExtendedFileSystemView extends FileSystemView
 {
 	private File[] roots;
-	private ImageIcon savedFile;
-	private ImageIcon conflictedFile;
 	private File homeDirectory;
-	private boolean withCheckSumChecking = false;
+	private ClientController controller;
 	FileSystemView localSystem = new FileSystemView()
 	{
 		@Override
@@ -67,9 +64,11 @@ public class ExtendedFileSystemView extends FileSystemView
 		}
 	};
 
-	public ExtendedFileSystemView( final File[] newRoots, final File newHomeDirectory )
+	public ExtendedFileSystemView( final File[] newRoots, final File newHomeDirectory,
+									ClientController controller)
 	{
 		this.roots = newRoots;
+		this.controller = controller;
 		this.homeDirectory = newHomeDirectory;
 	}
 
@@ -130,25 +129,10 @@ public class ExtendedFileSystemView extends FileSystemView
 			if( files[i].isFile() )
 			{
 				filesToCheck.add( files[i]);
-				//todo remote file checking
 			}
 			i++;
 		}
-		for( ExtendedFile temp : filesToCheck )
-		{
-			if( temp.isIsStored() )
-			{
-				temp.setFileIcon( savedFile );
-			}
-			else
-			{
-				if( temp.isIsConflicted())
-				{
-					temp.setFileIcon( conflictedFile );
-				}
-			}
-		}
-		return files;
+		return controller.areFilesVersioned(files);
 	}
 
 	@Override
@@ -189,19 +173,5 @@ public class ExtendedFileSystemView extends FileSystemView
 	{
 		return new ExtendedFile( localSystem.createFileObject( dir, filename ).
 				getPath() );
-	}
-
-	@Override
-	public Icon getSystemIcon( File f )
-	{
-		if( f instanceof ExtendedFile && ((ExtendedFile) f).getFileIcon()!=null )
-		{
-			return ((ExtendedFile) f).getFileIcon();
-		}
-		else
-		{
-			return super.getSystemIcon( f );
-		}
-		
 	}
 }

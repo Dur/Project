@@ -16,6 +16,7 @@ import javax.swing.TransferHandler;
 public class ListTransferHandler extends TransferHandler
 {
 	private JList list;
+	private List<File> files = new ArrayList<>();
 
 	public ListTransferHandler( JList list )
 	{
@@ -73,12 +74,25 @@ public class ListTransferHandler extends TransferHandler
 		for( Object file : data )
 		{
 			model.addElement( (File) file );
+			files.add((File) file);
 		}
 		return true;
 	}
 
+	public List<File> getFiles()
+	{
+		return files;
+	}
+	
 	private void displayDropLocation( String string )
 	{
 		System.out.println( string );
+	}
+	
+	public void clear()
+	{
+		DefaultListModel model = (DefaultListModel) list.getModel();
+		model.clear();
+		files.clear();
 	}
 }

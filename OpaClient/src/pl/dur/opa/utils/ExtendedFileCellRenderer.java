@@ -28,14 +28,15 @@ public class ExtendedFileCellRenderer extends DefaultListCellRenderer
 		{
 			JLabel l = (JLabel) c;
 			File f = (File) value;
-			ImageIcon icon = new ImageIcon( "icons//fileOk.jpg" ) {};
-			if( f.isFile() )
+			l.setIcon( FileSystemView.getFileSystemView().getSystemIcon( f ));
+			ImageIcon icon = new ImageIcon( "icons//fileOk.jpg" );
+			if( f.isFile() && f instanceof ExtendedFile )
 			{
-				l.setIcon( icon );
-			}
-			else
-			{
-				l.setIcon( FileSystemView.getFileSystemView().getSystemIcon( f ) );
+				ExtendedFile file = (ExtendedFile)f;
+				if( file.isIsStored() )
+				{
+					l.setIcon( icon );
+				}
 			}
 			l.setText( f.getName() );
 			l.setToolTipText( f.getAbsolutePath() );
