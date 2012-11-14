@@ -6,6 +6,10 @@ package pl.dur.opa.main;
 
 import java.io.File;
 import java.io.IOException;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import test.RunnableTest;
 
 /**
  *
@@ -27,9 +31,19 @@ public class testClass
 //		fileAdmin.appendToFile( "test".getBytes() );
 
 		//LocalFileAdministrator kopia = new LocalFileAdministrator( new File( "C:\\" ), "kopia.iso" );
-		File file = new File( "D:\\Gry\\Brood_War.ISO" );
-		File conf = new File( "C:\\log.txt" );
-		System.out.println(file.getParent());
+//		File file = new File( "D:\\Gry\\Brood_War.ISO" );
+//		File conf = new File( "C:\\log.txt" );
+//		System.out.println(file.getParent());
+		JFrame frame = new JFrame();
+		JPanel panel = new JPanel();
+		JProgressBar bar = new JProgressBar( 0, 100 );
+		panel.add(bar);
+		frame.add(panel);
+		frame.setSize( 100, 100 );
+		frame.setVisible( true );
+		
+		Thread thread = new Thread(new RunnableTest(bar));
+		thread.start();
 //		for( int a = 1; a < 20; a++ )
 //		{
 //			TaskExecutor ex = new TaskExecutor( new SaveFileDescriptorTask( file, conf ) );
@@ -65,5 +79,18 @@ public class testClass
 //			ex.printStackTrace();
 //		}
 
+	}
+
+	private static class ThreadImpl extends Thread
+	{
+		public ThreadImpl( Runnable target )
+		{
+			super( target );
+		}
+
+		public void run()
+		{
+			
+		}
 	}
 }

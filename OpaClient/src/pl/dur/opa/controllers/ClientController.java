@@ -10,17 +10,16 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import pl.dur.opa.file.browser.RemoteFileBrowser;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import pl.dur.opa.remote.interfaces.UserAuthenticator;
 import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.tasks.ReceiveFileTask;
 import pl.dur.opa.tasks.SendFileTask;
 import pl.dur.opa.tasks.TaskExecutor;
+import pl.dur.opa.tasks.UpdateProgressTask;
 import pl.dur.opa.utils.ExtendedFile;
+import pl.dur.opa.utils.Fraction;
 import pl.dur.opa.view.LoggingPage;
 import pl.dur.opa.view.View;
 
@@ -34,6 +33,7 @@ public class ClientController
 	private View view;
 	private UsersInterface manipulator;
 	private String serverAddress = "";
+	private BlockingQueue<Fraction> progress;
 
 	public ClientController()
 	{
@@ -66,6 +66,10 @@ public class ClientController
 				view.createAndShowGUI();
 			}
 		} );
+		progress = new ArrayBlockingQueue<Fraction>(100);
+		TaskExecutor exec = new TaskExecutor( new UpdateProgressTask( progress, view.getLocalProgressBar()) );
+		Thread progressThread = new Thread(exec);
+		progressThread.start();
 		return true;
 	}
 
@@ -74,8 +78,8 @@ public class ClientController
 		String key;
 		try
 		{
-			key = manipulator.saveFile( serverDirectory, file.getName() );
-			TaskExecutor executor = new TaskExecutor( new SendFileTask( file, 80, serverAddress, key ) );
+			key = manipulator.saveFile( serverDirectory, file.getName(), file.lastModified() );
+			TaskExecutor executor = new TaskExecutor( new SendFileTask( file, 80, serverAddress, key, file.lastModified(), progress ) );
 			Thread thread = new Thread( executor );
 			thread.start();
 		}
@@ -93,7 +97,7 @@ public class ClientController
 			String key = manipulator.getFile( remoteFile );
 			TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( localDirectory, key, remoteFile.
 					getName(),
-					serverAddress, 80 ) );
+					serverAddress, 80, remoteFile.lastModified() ) );
 			Thread thread = new Thread( executor );
 			thread.start();
 		}
@@ -114,6 +118,18 @@ public class ClientController
 			ex.printStackTrace();
 		}
 		return files;
+	}
+	
+	public void deleteFile(File file)
+	{
+		try
+		{
+			manipulator.removeFileFromServer( new ExtendedFile(file.getPath()) );
+		}
+		catch( RemoteException ex )
+		{
+			ex.printStackTrace();
+		}
 	}
 
 	public LoggingPage getLoggingPage()

@@ -25,10 +25,11 @@ public class ConnectionAdministrator
 		return taskKey;
 	}
 
-	public String getSocketForFileReceiving( File directory, String name, LocalFileAdministrator fileAdmin )
+	public String getSocketForFileReceiving( File directory, String name, LocalFileAdministrator fileAdmin, long lastModified )
 	{
 		String taskKey = generateRandomString();
-		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name, fileAdmin ) );
+		taskKey.getBytes();
+		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name, fileAdmin, lastModified ) );
 		return taskKey;
 	}
 
@@ -38,7 +39,7 @@ public class ConnectionAdministrator
 		Random generator = new Random();
 		byte keyBytes[] = new byte[ KEY_SIZE ];
 		generator.nextBytes( keyBytes );
-		for( int i = 0; i < keyBytes.length - 1; i++ )
+		for( int i = 0; i < keyBytes.length; i++ )
 		{
 			if( keyBytes[i] < 0 )
 			{

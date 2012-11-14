@@ -1,7 +1,9 @@
 package pl.dur.opa.tasks;
 
 import java.io.File;
+import java.util.concurrent.BlockingQueue;
 import pl.dur.opa.sockets.SocketWrapper;
+import pl.dur.opa.utils.Fraction;
 
 /**
  * Task class to implement sending file to user. 
@@ -17,6 +19,8 @@ public class SendFileTask implements Task
 	private final Integer port;
 	private final String host;
 	private final String key;
+	private final long lastModified;
+	private BlockingQueue<Fraction> queue;
 
 	/**
 	 * Constructor.
@@ -26,19 +30,21 @@ public class SendFileTask implements Task
 	 * @param newHost - host to connnect.
 	 */
 	public SendFileTask( final File newFileToSend, final Integer newSocketPort, 
-						final String newHost, final String key )
+						final String newHost, final String key, long lastModified, BlockingQueue<Fraction> queue )
 	{
 		this.file = newFileToSend;
 		this.port = newSocketPort;
 		this.host = newHost;
 		this.key = key;
+		this.lastModified = lastModified;
+		this.queue = queue;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		final SocketWrapper socket = new SocketWrapper( port, host );
-		socket.sendFile( key, file );
+		final SocketWrapper socket = new SocketWrapper( port, host, queue );
+		socket.sendFile( key, file, lastModified );
 		return true;
 	}
 }

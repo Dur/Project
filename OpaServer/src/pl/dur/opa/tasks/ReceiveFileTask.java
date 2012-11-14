@@ -16,23 +16,25 @@ public class ReceiveFileTask implements Task, SocketTask
 	private final String fileName;
 	private SocketWrapper socketWrapper;
 	private LocalFileAdministrator fileAdmin;
+	private long lastModified;
 
 	/**
 	 * Constructor.
 	 * @param newDirectory - directory where file should be stored.
 	 * @param newFileName - name of new file.
 	 */
-	public ReceiveFileTask( final File newDirectory, final String newFileName, LocalFileAdministrator fileAdmin )
+	public ReceiveFileTask( final File newDirectory, final String newFileName, LocalFileAdministrator fileAdmin, long lastModified )
 	{
 		this.directory = newDirectory;
 		this.fileName = newFileName;
 		this.fileAdmin = fileAdmin;
+		this.lastModified = lastModified;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		socketWrapper.receiveFile( fileName, directory, fileAdmin );
+		socketWrapper.receiveFile( fileName, directory, fileAdmin, lastModified );
 		return true;
 	}
 

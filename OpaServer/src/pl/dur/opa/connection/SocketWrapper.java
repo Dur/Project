@@ -43,7 +43,7 @@ public class SocketWrapper
 	 * @param name - name of file.
 	 * @param directory - directory where selected file should be stored.
 	 */
-	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin )
+	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin, long lastModified )
 	{
 		try
 		{
@@ -60,6 +60,8 @@ public class SocketWrapper
 			client.close();
 			inFile.close();
 			System.out.println("Befor calculating crc");
+				file.setLastModified( lastModified );
+			file.length();
 			TaskExecutor executor = new TaskExecutor( new SaveFileDescriptorTask( file, fileAdmin ) );
 			Thread thread = new Thread(executor);
 			thread.start();

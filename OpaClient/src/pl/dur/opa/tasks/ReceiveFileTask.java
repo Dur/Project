@@ -16,6 +16,7 @@ public class ReceiveFileTask implements Task
 	private final String fileName;
 	private final String host;
 	private final Integer port;
+	private final long lastModified;
 
 	/**
 	 * Constructor.
@@ -27,20 +28,22 @@ public class ReceiveFileTask implements Task
 	 */
 	public ReceiveFileTask( final File newDirectory, final String newKey, 
 							final String newFileName, final String newHost,
-							final Integer port )
+							final Integer port,
+							final long lastModified)
 	{
 		this.directory = newDirectory;
 		this.key = newKey;
 		this.fileName = newFileName;
 		this.host = newHost;
 		this.port = port;
+		this.lastModified = lastModified;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		final SocketWrapper socket = new SocketWrapper( port, host );
-		socket.receiveFile( key, fileName, directory );
+		final SocketWrapper socket = new SocketWrapper( port, host, null );
+		socket.receiveFile( key, fileName, directory, lastModified );
 		return true;
 	}
 }

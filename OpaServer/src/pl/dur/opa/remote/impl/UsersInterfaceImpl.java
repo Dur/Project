@@ -55,9 +55,9 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 	}
 
 	@Override
-	public final String saveFile( final File directory, String fileName ) throws RemoteException
+	public final String saveFile( final File directory, String fileName, long lastModified ) throws RemoteException
 	{
-		return connectionAdmin.getSocketForFileReceiving( directory, fileName, filesAdministrator );
+		return connectionAdmin.getSocketForFileReceiving( directory, fileName, filesAdministrator, lastModified );
 	}
 
 	@Override

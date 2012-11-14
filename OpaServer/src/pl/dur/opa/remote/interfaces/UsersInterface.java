@@ -45,7 +45,7 @@ public interface UsersInterface extends Remote
 	 *
 	 * @throws RemoteException
 	 */
-	String saveFile( File directory, String fileName ) throws RemoteException;
+	String saveFile( File directory, String fileName, long lastModified ) throws RemoteException;
 
 	/**
 	 * Returns String which is a key to send back by socket. This key determine

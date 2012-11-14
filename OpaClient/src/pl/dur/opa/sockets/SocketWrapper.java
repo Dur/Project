@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.utils.Fraction;
 
 /**
  * Class to wrapp socket and make some operations on it. It can send files ad
@@ -25,6 +27,7 @@ public class SocketWrapper
 	private String host;
 	private LocalFileAdministrator fileAdmin;
 	private final static int PACKAGE_SIZE = 1024;
+	private BlockingQueue<Fraction> queue;
 
 	/**
 	 * Constructor.
@@ -32,10 +35,11 @@ public class SocketWrapper
 	 * @param newPort - port for new socket.
 	 * @param newHost - host to connect.
 	 */
-	public SocketWrapper( final int newPort, final String newHost )
+	public SocketWrapper( final int newPort, final String newHost, BlockingQueue<Fraction> queue )
 	{
 		this.port = newPort;
 		this.host = newHost;
+		this.queue = queue;
 	}
 
 	/**
@@ -46,7 +50,7 @@ public class SocketWrapper
 	 * @param name - name of file.
 	 * @param directory - directory where selected file should be stored.
 	 */
-	public void receiveFile( String key, String name, File directory )
+	public void receiveFile( String key, String name, File directory, long lastModified )
 	{
 		try
 		{
@@ -64,6 +68,9 @@ public class SocketWrapper
 				inFile.write( buffer, 0, len );
 			}
 			socket.close();
+			fileAdmin.getFile().setLastModified( lastModified );
+			inFile.close();
+			
 		}
 		catch( IOException ex )
 		{
@@ -77,33 +84,41 @@ public class SocketWrapper
 	 *
 	 * @param file - selected file.
 	 */
-	public void sendFile( String key, File file )
+	public void sendFile( String key, File fileToSend, long lastModified )
 	{
 		try
 		{
+			Fraction fraction;
+			long bytesSend = 0;
+			Long fileSize = fileToSend.length();
 			socket = new Socket( host, port );
 			System.out.println( "After connecting to server" );
-			fileAdmin = new LocalFileAdministrator( file );
-			File fileToSend = fileAdmin.getFile();
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			OutputStream os = socket.getOutputStream();
-			os.write( key.getBytes() );
 			BufferedOutputStream out = new BufferedOutputStream( os, PACKAGE_SIZE );
+			out.write( key.getBytes() );
 			FileInputStream in = new FileInputStream( fileToSend );
 			int len = 0;
-			int bytecount = PACKAGE_SIZE;
 			while( (len = in.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
 			{
-				bytecount = bytecount + PACKAGE_SIZE;
+				bytesSend +=len;
+				fraction = new Fraction( fileSize, bytesSend );
+				queue.put( fraction );
 				out.write( buffer, 0, len );
 				out.flush();
 			}
 			socket.shutdownOutput();
 			socket.close();
+			in.close();
+			fileToSend.setLastModified( lastModified );
 		}
 		catch( IOException ex )
 		{
 			ex.printStackTrace();
+		}
+		catch(InterruptedException ie)
+		{
+			ie.printStackTrace();
 		}
 	}
 }

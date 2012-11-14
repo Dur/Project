@@ -23,7 +23,6 @@ public class View extends JPanel implements ActionListener
 	private static final long serialVersionUID = -4487732343062917781L;
 	private JFileChooser remoteFiles;
 	private JFileChooser localFiles;
-	
 	private JButton send;
 	private JButton receive;
 	private JList rightDropZone;
@@ -34,15 +33,24 @@ public class View extends JPanel implements ActionListener
 	private JSplitPane serverNavi;
 	private JSplitPane localNavi;
 	private ClientController controller;
+	private JMenuItem refreshItem = new JMenuItem( "refresh" );
+	private JMenuItem refreshRemoteItem = new JMenuItem( "refresh" );
+	private JMenuItem deleteItem = new JMenuItem( "delete" );
+	private JProgressBar localProgressBar = new JProgressBar( 0, 100);
+	private JProgressBar remoteProgressBar = new JProgressBar( 0, 100);
 
 	public View( ClientController controller )
 	{
 		super( new BorderLayout() );
 		this.controller = controller;
 	}
-	
+
 	private void initComponents() throws RemoteException
 	{
+		localProgressBar.setStringPainted( true );
+		localProgressBar.setString( "Ready");
+		remoteProgressBar.setStringPainted( true );
+		remoteProgressBar.setString( "Ready");
 		File[] roots = File.listRoots();
 		ArrayList<File> newRoots = new ArrayList<>();
 		for( File root : roots )
@@ -52,7 +60,16 @@ public class View extends JPanel implements ActionListener
 				newRoots.add( root );
 			}
 		}
-		roots = new File[newRoots.size()];
+		deleteItem.addActionListener( this );
+		refreshItem.addActionListener( this );
+		refreshRemoteItem.addActionListener( this );
+		JPopupMenu localPopup = new JPopupMenu( "localPopup" );
+		JPopupMenu remotePopup = new JPopupMenu( "remotePopup" );
+		localPopup.add( refreshItem );
+		remotePopup.add( deleteItem );
+		remotePopup.add( refreshRemoteItem );
+
+		roots = new File[ newRoots.size() ];
 		roots = (File[]) newRoots.toArray( roots );
 		localFiles = new JFileChooser( new ExtendedFileSystemView( roots, roots[0], controller ) );
 		localFiles.setMultiSelectionEnabled( true );
@@ -60,16 +77,20 @@ public class View extends JPanel implements ActionListener
 		localFiles.setControlButtonsAreShown( false );
 		localFiles.setFileSelectionMode( JFileChooser.FILES_ONLY );
 		localFiles.setFileView( new ExtendedFileView() );
-		
-		remoteFiles = new JFileChooser( new RemoteFileBrowser( controller.getManipulator().getFileSystemView() ) );
+		localFiles.setComponentPopupMenu( localPopup );
+
+
+		remoteFiles = new JFileChooser( new RemoteFileBrowser( controller.
+				getManipulator().getFileSystemView() ) );
 		remoteFiles.setMultiSelectionEnabled( true );
 		remoteFiles.setDragEnabled( true );
 		remoteFiles.setControlButtonsAreShown( false );
 		remoteFiles.setFileSelectionMode( JFileChooser.FILES_ONLY );
+		remoteFiles.setComponentPopupMenu( remotePopup );
 
 		JPanel localPanel = new JPanel( new BorderLayout() );
 		localPanel.add( localFiles, BorderLayout.CENTER );
-		
+
 		JPanel remotePanel = new JPanel( new BorderLayout() );
 		remotePanel.add( remoteFiles, BorderLayout.CENTER );
 
@@ -83,20 +104,20 @@ public class View extends JPanel implements ActionListener
 		leftPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		leftPanel.add( localPanel, BorderLayout.CENTER );
 		leftPanel.add( leftButtonPanel, BorderLayout.PAGE_END );
-		
+
 		receive = new JButton( "Receive" );
 		receive.addActionListener( this );
 		JPanel rightButtonPanel = new JPanel( new BorderLayout() );
 		rightButtonPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		rightButtonPanel.add( receive, BorderLayout.LINE_END );
-		
+
 		JPanel rightPanel = new JPanel( new BorderLayout() );
 		rightPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		rightPanel.add( remotePanel, BorderLayout.CENTER );
 		rightPanel.add( rightButtonPanel, BorderLayout.PAGE_END );
 
-		JScrollPane leftLowerPanel = new javax.swing.JScrollPane();
-		leftLowerPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		JScrollPane leftLowerScrollPanel = new javax.swing.JScrollPane();
+		leftLowerScrollPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		leftListModel = new DefaultListModel();
 		leftDropZone = new JList( leftListModel );
 		leftDropZone.setCellRenderer( new ExtendedFileCellRenderer() );
@@ -104,10 +125,23 @@ public class View extends JPanel implements ActionListener
 		leftDropZone.setDragEnabled( true );
 		leftDropZone.setDropMode( javax.swing.DropMode.INSERT );
 		leftDropZone.setBorder( new TitledBorder( "Files to send" ) );
-		leftLowerPanel.setViewportView( new JScrollPane( leftDropZone ) );
-		
-		JScrollPane rightLoverPanel = new javax.swing.JScrollPane();
-		rightLoverPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		leftLowerScrollPanel.setViewportView( new JScrollPane( leftDropZone ) );
+
+		JPanel leftProgressPanel = new JPanel( new BorderLayout() );
+		leftProgressPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		leftProgressPanel.add( localProgressBar, BorderLayout.CENTER );
+
+		JPanel rightProgressPanel = new JPanel( new BorderLayout() );
+		rightProgressPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		rightProgressPanel.add(remoteProgressBar , BorderLayout.CENTER );
+
+		JPanel leftLowerPanel = new JPanel( new BorderLayout() );
+		leftLowerPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		leftLowerPanel.add( leftLowerScrollPanel, BorderLayout.CENTER );
+		leftLowerPanel.add( leftProgressPanel, BorderLayout.PAGE_END );
+
+		JScrollPane rightLoverScrollPanel = new javax.swing.JScrollPane();
+		rightLoverScrollPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		rightListModel = new DefaultListModel();
 		rightDropZone = new JList( rightListModel );
 		rightDropZone.setCellRenderer( new ExtendedFileCellRenderer() );
@@ -115,18 +149,23 @@ public class View extends JPanel implements ActionListener
 		rightDropZone.setDragEnabled( true );
 		rightDropZone.setDropMode( javax.swing.DropMode.INSERT );
 		rightDropZone.setBorder( new TitledBorder( "Files to download" ) );
-		rightLoverPanel.setViewportView( new JScrollPane( rightDropZone ) );
+		rightLoverScrollPanel.setViewportView( new JScrollPane( rightDropZone ) );
+
+		JPanel rightLowerPanel = new JPanel( new BorderLayout() );
+		rightLowerPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		rightLowerPanel.add( rightLoverScrollPanel, BorderLayout.CENTER );
+		rightLowerPanel.add( rightProgressPanel, BorderLayout.PAGE_END );
 
 		localNavi = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
 				leftPanel, leftLowerPanel );
 		localNavi.setDividerLocation( 300 );
 		localNavi.setPreferredSize( new Dimension( 450, 500 ) );
-		
+
 		serverNavi = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
-				rightPanel, rightLoverPanel );
+				rightPanel, rightLowerPanel );
 		serverNavi.setDividerLocation( 300 );
 		serverNavi.setPreferredSize( new Dimension( 450, 500 ) );
-		
+
 		splitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
 				localNavi, serverNavi );
 		splitPane.setDividerLocation( 500 );
@@ -137,22 +176,25 @@ public class View extends JPanel implements ActionListener
 
 	public void receiveAction()
 	{
-		System.out.println("Receive Action");
-		List<File> filesToReceive = ((ListTransferHandler)rightDropZone.getTransferHandler()).getFiles();
+		System.out.println( "Receive Action" );
+		List<File> filesToReceive = ((ListTransferHandler) rightDropZone.
+				getTransferHandler()).getFiles();
 		File fileToReceive = filesToReceive.get( 0 );
+		System.out.println( fileToReceive.length() );
 		File directory = localFiles.getCurrentDirectory();
 		controller.receiveFile( directory, fileToReceive );
-		((ListTransferHandler)rightDropZone.getTransferHandler()).clear();
+		((ListTransferHandler) rightDropZone.getTransferHandler()).clear();
 	}
-	
-	public void sendAction( )
+
+	public void sendAction()
 	{
-		System.out.println("send action");
-		List<File> filesToSend = ((ListTransferHandler)leftDropZone.getTransferHandler()).getFiles();
+		System.out.println( "send action" );
+		List<File> filesToSend = ((ListTransferHandler) leftDropZone.
+				getTransferHandler()).getFiles();
 		File fileToSend = filesToSend.get( 0 );
 		File directory = remoteFiles.getCurrentDirectory();
 		controller.sendFile( directory, fileToSend );
-		((ListTransferHandler)leftDropZone.getTransferHandler()).clear();
+		((ListTransferHandler) leftDropZone.getTransferHandler()).clear();
 	}
 
 	/**
@@ -204,11 +246,34 @@ public class View extends JPanel implements ActionListener
 	{
 		if( e.getSource() == send )
 		{
-			sendAction( );
+			sendAction();
 		}
 		if( e.getSource() == receive )
 		{
 			receiveAction();
 		}
+		if( e.getSource() == refreshItem )
+		{
+		}
+		if( e.getSource() == deleteItem )
+		{
+
+			File file = remoteFiles.getSelectedFile();
+			if( file != null )
+			{
+				System.out.println( "selected file is " + file.getName() );
+				controller.deleteFile( file );
+			}
+
+		}
+		if( e.getSource() == refreshRemoteItem )
+		{
+			remoteFiles.rescanCurrentDirectory();
+		}
+	}
+	
+	public JProgressBar getLocalProgressBar()
+	{
+		return localProgressBar;
 	}
 }
