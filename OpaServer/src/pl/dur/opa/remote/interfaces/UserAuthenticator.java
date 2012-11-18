@@ -2,9 +2,6 @@ package pl.dur.opa.remote.interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
-import pl.dur.opa.remote.impl.UsersInterfaceImpl;
-import pl.dur.opa.utils.ExtendedFile;
 
 /**
  * Interface to manipulate files located on server. Client calls methods of this
@@ -23,5 +20,5 @@ public interface UserAuthenticator extends Remote
 	 * @param password - password.
 	 * @return boolaen if users was successfully loged or not
 	 */
-	UsersInterface loginUser(String username, String password )  throws RemoteException;
+	UsersInterface loginUser(String username, String password, Notificator notificator )  throws RemoteException;
 }

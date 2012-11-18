@@ -1,7 +1,12 @@
 package pl.dur.opa.tasks;
 
 import java.io.File;
+import java.rmi.RemoteException;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.sockets.SocketWrapper;
 import pl.dur.opa.utils.Fraction;
 
@@ -15,12 +20,12 @@ import pl.dur.opa.utils.Fraction;
  */
 public class SendFileTask implements Task
 {
-	private final File file;
-	private final Integer port;
+	private final List<File> files;
+	private final int port;
 	private final String host;
-	private final String key;
-	private final long lastModified;
 	private BlockingQueue<Fraction> queue;
+	private UsersInterface manipulator;
+	private File serverDirectory;
 
 	/**
 	 * Constructor.
@@ -29,22 +34,35 @@ public class SendFileTask implements Task
 	 * @param newSocketPort - port for socket.
 	 * @param newHost - host to connnect.
 	 */
-	public SendFileTask( final File newFileToSend, final Integer newSocketPort, 
-						final String newHost, final String key, long lastModified, BlockingQueue<Fraction> queue )
+	public SendFileTask( final List<File> newFilesToSend, final int newSocketPort, 
+						final String newHost, BlockingQueue<Fraction> queue, 
+						UsersInterface manipulator, File serverDirectory )
 	{
-		this.file = newFileToSend;
+		this.files = newFilesToSend;
 		this.port = newSocketPort;
 		this.host = newHost;
-		this.key = key;
-		this.lastModified = lastModified;
 		this.queue = queue;
+		this.manipulator = manipulator;
+		this.serverDirectory = serverDirectory;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
 		final SocketWrapper socket = new SocketWrapper( port, host, queue );
-		socket.sendFile( key, file, lastModified );
+		String key;
+		for( File file : files )
+		{
+			try
+			{
+				key = manipulator.saveFile( serverDirectory, file.getName(), file.lastModified() );
+				socket.sendFile( key, file, file.lastModified() );
+			}
+			catch( RemoteException ex )
+			{
+				ex.printStackTrace();
+			}
+		}
 		return true;
 	}
 }

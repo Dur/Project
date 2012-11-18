@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dur.opa.server.configuration;
 
 import java.io.BufferedReader;
@@ -11,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import pl.dur.opa.utils.Logger;
 
 /**
  * Class which reads configuration file and updates server dependencies.
@@ -60,11 +57,11 @@ public class UsersConfiguration
 					value = tokenizer.nextToken().trim();
 					if( key.contains( " " ) || value.contains( " " ) )
 					{
-						System.out.println( "bad configuration file structure" );
+						Logger.log( "bad configuration file structure" );
 						return;
 					}
 					users.put( key, value );
-					System.out.println( key + " = " + value );
+					Logger.log( key + " = " + value );
 				}
 			}
 		}

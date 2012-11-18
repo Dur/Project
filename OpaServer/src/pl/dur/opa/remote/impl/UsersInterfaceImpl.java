@@ -7,9 +7,9 @@ package pl.dur.opa.remote.impl;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import pl.dur.opa.connection.ConnectionAdministrator;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
 import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.utils.ExtendedFile;
@@ -26,13 +26,15 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 	private LocalFileAdministrator filesAdministrator;
 	private RemoteFileSystemViewImpl fileSystemView;
 	private File userHomeDirectory;
+	private Notificator notificator;
 
 	/**
 	 * Constructor.
 	 */
-	public UsersInterfaceImpl( File usersHome, LocalFileAdministrator fileAdmin, RemoteFileSystemViewImpl fileSystemView ) throws RemoteException
+	public UsersInterfaceImpl( File usersHome, LocalFileAdministrator fileAdmin, 
+			RemoteFileSystemViewImpl fileSystemView, Notificator notificator) throws RemoteException
 	{
-		connectionAdmin = new ConnectionAdministrator();
+		connectionAdmin = new ConnectionAdministrator(notificator);
 		this.fileSystemView = fileSystemView;
 		this.userHomeDirectory = usersHome;
 		if( !userHomeDirectory.exists() )
@@ -40,6 +42,7 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 			userHomeDirectory.mkdirs();
 		}
 		this.filesAdministrator = fileAdmin;
+		this.notificator = notificator;
 	}
 
 	@Override
@@ -49,21 +52,9 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 	}
 
 	@Override
-	public final String getFiles( final File[] files ) throws RemoteException
-	{
-		throw new UnsupportedOperationException( "Not supported yet." );
-	}
-
-	@Override
 	public final String saveFile( final File directory, String fileName, long lastModified ) throws RemoteException
 	{
 		return connectionAdmin.getSocketForFileReceiving( directory, fileName, filesAdministrator, lastModified );
-	}
-
-	@Override
-	public final String saveFiles( final File directory ) throws RemoteException
-	{
-		throw new UnsupportedOperationException( "Not supported yet." );
 	}
 
 	@Override
@@ -86,5 +77,24 @@ public class UsersInterfaceImpl extends UnicastRemoteObject implements UsersInte
 	public RemoteFileSystemView getFileSystemView( ) throws RemoteException
 	{
 		return fileSystemView;
+	}
+
+	@Override
+	public long getFileLastModify( File file ) throws RemoteException
+	{
+		if( file != null && file.canRead() )
+		{
+			return file.lastModified();
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	@Override
+	public File locateFileOnServer( ExtendedFile file ) throws RemoteException
+	{
+		return filesAdministrator.locateFile(file);
 	}
 }

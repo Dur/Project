@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.tasks.SaveFileDescriptorTask;
 import pl.dur.opa.tasks.TaskExecutor;
 import pl.dur.opa.utils.ExtendedFile;
@@ -43,7 +44,7 @@ public class SocketWrapper
 	 * @param name - name of file.
 	 * @param directory - directory where selected file should be stored.
 	 */
-	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin, long lastModified )
+	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin, long lastModified, Notificator notificator )
 	{
 		try
 		{
@@ -60,9 +61,9 @@ public class SocketWrapper
 			client.close();
 			inFile.close();
 			System.out.println("Befor calculating crc");
-				file.setLastModified( lastModified );
+			file.setLastModified( lastModified );
 			file.length();
-			TaskExecutor executor = new TaskExecutor( new SaveFileDescriptorTask( file, fileAdmin ) );
+			TaskExecutor executor = new TaskExecutor( new SaveFileDescriptorTask( file, fileAdmin, notificator ) );
 			Thread thread = new Thread(executor);
 			thread.start();
 		}
@@ -72,22 +73,25 @@ public class SocketWrapper
 		}
 	}
 
-	public void sendFile( File file )
+	public void sendFile( File file, Notificator notificator )
 	{
+		Double size = new Double(file.length());
 		try
 		{
+			
 			ExtendedFile fileToSend = new ExtendedFile( file.getPath() );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			OutputStream os = client.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream( os, PACKAGE_SIZE );
 			FileInputStream in = new FileInputStream( fileToSend );
 			int len = 0;
-			int bytecount = PACKAGE_SIZE;
+			int bytecount = 0;
 			while( (len = in.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
 			{
-				bytecount = bytecount + PACKAGE_SIZE;
+				bytecount += len;
 				out.write( buffer, 0, len );
 				out.flush();
+				notificator.serverProgressMessage( "Sending: " + file.getName() + "  ", new Double((bytecount/size)*100).intValue());
 			}
 			client.shutdownOutput();
 		}

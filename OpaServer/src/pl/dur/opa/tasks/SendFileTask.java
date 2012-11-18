@@ -2,6 +2,7 @@ package pl.dur.opa.tasks;
 
 import java.io.File;
 import pl.dur.opa.connection.SocketWrapper;
+import pl.dur.opa.remote.interfaces.Notificator;
 
 /**
  * Task class to implement sending file to user. 
@@ -11,7 +12,7 @@ import pl.dur.opa.connection.SocketWrapper;
  *
  * @author Dur
  */
-public class SendFileTask implements Task, SocketTask
+public class SendFileTask extends TaskNotificator implements Task, SocketTask
 {
 	private final File file;
 	private SocketWrapper socketWrapper;
@@ -22,15 +23,16 @@ public class SendFileTask implements Task, SocketTask
 	 * @param newFileToSend - file to be send to client.
 	 * @param newSocketPort - port for socket.
 	 */
-	public SendFileTask( final File newFileToSend )
+	public SendFileTask( final File newFileToSend, Notificator notificator )
 	{
+		super(notificator);
 		this.file = newFileToSend;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
-		socketWrapper.sendFile( file );
+		socketWrapper.sendFile( file, super.getNotificator() );
 		return true;
 	}
 

@@ -65,7 +65,8 @@ public class ConnectionAccepter implements Runnable
 					{
 						task.setSocket( new SocketWrapper( clientSocket ) );
 						taskExecutor = new TaskExecutor( task );
-						taskExecutor.run();
+						Thread thread = new Thread(taskExecutor);
+						thread.start();
 						tasksMap.remove( parsedKey );
 					}
 					else

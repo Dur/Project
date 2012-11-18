@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dur.opa.server.configuration;
 
 import java.io.BufferedReader;
@@ -11,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import pl.dur.opa.utils.Logger;
 
 /**
  * Class which reads configuration file and updates server dependencies.
@@ -21,7 +18,6 @@ import java.util.StringTokenizer;
  */
 public class Configuration
 {
-	private boolean isConfFile;
 	private HashMap<String, String> params = new HashMap<>();
 
 	public Configuration()
@@ -34,8 +30,7 @@ public class Configuration
 		File configurationFile = new File( "conf//server.conf" );
 		if( !configurationFile.canRead() )
 		{
-			System.out.println( "no file" );
-			isConfFile = false;
+			Logger.log( "no file" );
 			return;
 		}
 		try
@@ -55,23 +50,21 @@ public class Configuration
 					value = tokenizer.nextToken().trim();
 					if( key.contains( " " ) || value.contains( " " ) )
 					{
-						System.out.println( "bad configuration file structure" );
+						Logger.log( "bad configuration file structure" );
 						return;
 					}
 					params.put( key, value );
-					System.out.println( key + " = " + value );
+					Logger.log( key + " = " + value );
 				}
 			}
 		}
 		catch( FileNotFoundException ex )
 		{
-			isConfFile = false;
 			return;
 		}
 		catch( IOException iex )
 		{
 			iex.printStackTrace();
-			isConfFile = false;
 			return;
 		}
 	}

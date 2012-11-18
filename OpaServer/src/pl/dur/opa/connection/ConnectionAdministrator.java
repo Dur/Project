@@ -7,6 +7,7 @@ package pl.dur.opa.connection;
 import java.io.File;
 import java.util.Random;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.tasks.ReceiveFileTask;
 import pl.dur.opa.tasks.SendFileTask;
 
@@ -17,11 +18,19 @@ import pl.dur.opa.tasks.SendFileTask;
 public class ConnectionAdministrator
 {
 	private final static int KEY_SIZE = 8;
+	
+	private Notificator notificator;
 
+	public ConnectionAdministrator(Notificator notificator)
+	{
+		this.notificator = notificator;
+	}
+
+	
 	public String getSocketNumForFileSending( File file )
 	{
 		String taskKey = generateRandomString();
-		ConnectionAccepter.putTaskToMap( taskKey, new SendFileTask( file ) );
+		ConnectionAccepter.putTaskToMap( taskKey, new SendFileTask( file, notificator ) );
 		return taskKey;
 	}
 
@@ -29,7 +38,7 @@ public class ConnectionAdministrator
 	{
 		String taskKey = generateRandomString();
 		taskKey.getBytes();
-		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name, fileAdmin, lastModified ) );
+		ConnectionAccepter.putTaskToMap( taskKey, new ReceiveFileTask( directory, name, fileAdmin, lastModified, notificator ) );
 		return taskKey;
 	}
 

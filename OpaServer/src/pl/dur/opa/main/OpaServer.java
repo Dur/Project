@@ -1,52 +1,66 @@
 package pl.dur.opa.main;
 
-import java.io.File;
 import java.rmi.RMISecurityManager;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import pl.dur.opa.connection.ConnectionAccepter;
-import pl.dur.opa.remote.impl.RemoteFileSystemViewImpl;
-import pl.dur.opa.remote.impl.UserAuthenticatorImpl;
-import pl.dur.opa.server.configuration.Configuration;
-import pl.dur.opa.server.configuration.UsersConfiguration;
+import pl.dur.opa.server.controller.Controller;
+import pl.dur.opa.server.view.ServerView;
 
 /**
- * Class which starts server and prepares it to serve clients.
- * After calling main method of this class server is ready for catching client connections. 
+ * Class which starts server and prepares it to serve clients. 
+ * After calling main method of this class server is ready
+ * for catching client connections.
+ *
  * @author Dur
  */
 public final class OpaServer
 {
+	private ServerView view;
+	private Controller controller;
+
 	/**
 	 * Construtor.
 	 */
 	private OpaServer()
 	{
-		
+		view = new ServerView();
+		controller = new Controller( view );
 	}
+
+	public Controller getController()
+	{
+		return controller;
+	}
+
+	public void setController( Controller controller )
+	{
+		this.controller = controller;
+	}
+
+	public ServerView getView()
+	{
+		return view;
+	}
+
+	public void setView( ServerView view )
+	{
+		this.view = view;
+	}
+
 	/**
 	 * Program starter.
+	 *
 	 * @param args - not used.
 	 */
 	public static void main( final String[] args )
 	{
+		final OpaServer server = new OpaServer();
+
 		System.setSecurityManager( new RMISecurityManager() );
-		try
+		java.awt.EventQueue.invokeLater( new Runnable()
 		{
-			Configuration conf = new Configuration();
-			
-			File root = new File(conf.getParameter( "ROOT") );
-			UsersConfiguration users = new UsersConfiguration();
-			UserAuthenticatorImpl authenticator = new UserAuthenticatorImpl( users, root );
-			Registry registry = LocateRegistry.createRegistry( 1099 );
-			registry.rebind( "AUTH", authenticator);
-			
-			Thread connectionListener = new Thread( new ConnectionAccepter( 80 ) );
-			connectionListener.start();
-		}
-		catch( Exception x )
-		{
-			System.out.println( x.toString() );
-		}
+			public void run()
+			{
+				server.getView().setVisible( true );
+			}
+		} );
 	}
 }

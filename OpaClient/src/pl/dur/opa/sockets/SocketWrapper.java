@@ -68,9 +68,9 @@ public class SocketWrapper
 				inFile.write( buffer, 0, len );
 			}
 			socket.close();
-			fileAdmin.getFile().setLastModified( lastModified );
 			inFile.close();
-			
+			fileAdmin.getFile().setLastModified( lastModified );
+
 		}
 		catch( IOException ex )
 		{
@@ -101,8 +101,8 @@ public class SocketWrapper
 			int len = 0;
 			while( (len = in.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
 			{
-				bytesSend +=len;
-				fraction = new Fraction( fileSize, bytesSend );
+				bytesSend += len;
+				fraction = new Fraction( fileSize, bytesSend, "Sending: " + fileToSend.getName() );
 				queue.put( fraction );
 				out.write( buffer, 0, len );
 				out.flush();
@@ -116,7 +116,7 @@ public class SocketWrapper
 		{
 			ex.printStackTrace();
 		}
-		catch(InterruptedException ie)
+		catch( InterruptedException ie )
 		{
 			ie.printStackTrace();
 		}

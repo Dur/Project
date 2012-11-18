@@ -20,5 +20,5 @@ public interface UserAuthenticator extends Remote
 	 * @param password - password.
 	 * @return boolaen if users was successfully loged or not
 	 */
-	UsersInterface loginUser(String username, String password )  throws RemoteException;
+	UsersInterface loginUser(String username, String password, Notificator notificator )  throws RemoteException;
 }

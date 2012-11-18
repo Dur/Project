@@ -4,6 +4,7 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
+import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.remote.interfaces.UserAuthenticator;
 import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.server.configuration.UsersConfiguration;
@@ -19,6 +20,7 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 	private UsersInterface manipulator;
 	
 	private File rootDirectory;
+	
 
 	public UserAuthenticatorImpl( UsersConfiguration users, File rootDirectory ) throws RemoteException
 	{
@@ -27,7 +29,7 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 	}
 
 	@Override
-	public UsersInterface loginUser( String username, String password ) throws RemoteException
+	public UsersInterface loginUser( String username, String password, Notificator notificator ) throws RemoteException
 	{
 		if( users.checkCredentials( username, password ) == true )
 		{
@@ -36,7 +38,7 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 			File[] roots = new File[1];
 			roots[0] = fileAdmin.getHomeDir();
 			RemoteFileSystemViewImpl filesView = new RemoteFileSystemViewImpl( roots, roots[0] );
-			manipulator = new UsersInterfaceImpl(fileAdmin.getHomeDir(), fileAdmin, filesView );
+			manipulator = new UsersInterfaceImpl(fileAdmin.getHomeDir(), fileAdmin, filesView, notificator );
 			fileAdmin.listFiles();
 			return manipulator;
 		}

@@ -4,6 +4,7 @@
  */
 package pl.dur.opa.file.browser;
 
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -13,9 +14,8 @@ import pl.dur.opa.controllers.ClientController;
 import pl.dur.opa.utils.ExtendedFile;
 
 /**
- * Class implements RemoteFileSystemView and make it available for clients to
- * view server side file system. It will present server file system via RMI call
- * insted of clients local file system.
+ * Class implements RemoteFileSystemView and make it available for clients to view server side file system. It will
+ * present server file system via RMI call insted of clients local file system.
  *
  * @author Dur
  */
@@ -24,6 +24,8 @@ public class ExtendedFileSystemView extends FileSystemView
 	private File[] roots;
 	private File homeDirectory;
 	private ClientController controller;
+	private boolean withCRCCheck = false;
+	
 	FileSystemView localSystem = new FileSystemView()
 	{
 		@Override
@@ -35,8 +37,6 @@ public class ExtendedFileSystemView extends FileSystemView
 				throw new IOException( "Containing directory is null:" );
 			}
 			File newFolder = null;
-
-			// Unix - using OpenWindows' default folder name. Can't find one for Motif/CDE.
 
 			newFolder = createFileObject( containingDir, newFolderString );
 
@@ -53,8 +53,7 @@ public class ExtendedFileSystemView extends FileSystemView
 			}
 			if( newFolder.exists() )
 			{
-				throw new IOException( "Directory already exists:" + newFolder.
-						getAbsolutePath() );
+				throw new IOException( "Directory already exists:" + newFolder.getAbsolutePath() );
 			}
 			else
 			{
@@ -65,7 +64,7 @@ public class ExtendedFileSystemView extends FileSystemView
 	};
 
 	public ExtendedFileSystemView( final File[] newRoots, final File newHomeDirectory,
-									ClientController controller)
+			ClientController controller ) 
 	{
 		this.roots = newRoots;
 		this.controller = controller;
@@ -128,11 +127,28 @@ public class ExtendedFileSystemView extends FileSystemView
 			files[i] = new ExtendedFile( file.getPath() );
 			if( files[i].isFile() )
 			{
-				filesToCheck.add( files[i]);
+				if( withCRCCheck )
+				{
+					controller.notifyViewOfProgress( "Calculating CRC for:   " + file.getName(), 0, true );
+					try
+					{
+						if( files[i].isFile() )
+						{
+							files[i].setFileCheckSum( Files.getChecksum( files[i], new java.util.zip.CRC32() ) );
+						}
+					}
+					catch( IOException ex )
+					{
+						ex.printStackTrace();
+						controller.hideProgressPopup();
+					}
+				}
+				filesToCheck.add( files[i] );
 			}
 			i++;
 		}
-		return controller.areFilesVersioned(files);
+		controller.hideProgressPopup();
+		return controller.areFilesVersioned( files );
 	}
 
 	@Override
@@ -173,5 +189,10 @@ public class ExtendedFileSystemView extends FileSystemView
 	{
 		return new ExtendedFile( localSystem.createFileObject( dir, filename ).
 				getPath() );
+	}
+
+	public void setWithCRCCheck( boolean withCRC )
+	{
+		this.withCRCCheck = withCRC;
 	}
 }

@@ -28,16 +28,6 @@ public interface UsersInterface extends Remote
 	 * Returns String which is a key to send back by socket. This key determine
 	 * which operation server will do for client.
 	 *
-	 * @param files - files to download.
-	 * @return String key for task search.
-	 * @throws RemoteException
-	 */
-	String getFiles( File[] file ) throws RemoteException;
-
-	/**
-	 * Returns String which is a key to send back by socket. This key determine
-	 * which operation server will do for client.
-	 *
 	 * @return String key for task search.
 	 * @param directory - directory in which sended file should be saved.
 	 * @param fileName - name of file to save.
@@ -45,19 +35,6 @@ public interface UsersInterface extends Remote
 	 * @throws RemoteException
 	 */
 	String saveFile( File directory, String fileName, long lastModified ) throws RemoteException;
-
-	/**
-	 * Returns String which is a key to send back by socket. This key determine
-	 * which operation server will do for client. Diference between saveFile()
-	 * method is that after receiving first file, server will not close
-	 * connection. Use this method if u want to save more than one file. All
-	 * files will be save in the same directory.
-	 *
-	 * @return port number.
-	 * @param directory - directory in which sended files should be saved.
-	 * @throws RemoteException
-	 */
-	String saveFiles( File directory ) throws RemoteException;
 
 	/**
 	 * As a parameters it gets list of files to check if server contains files
@@ -74,4 +51,8 @@ public interface UsersInterface extends Remote
 	void removeFileFromServer( ExtendedFile file ) throws RemoteException;
 
 	RemoteFileSystemView getFileSystemView() throws RemoteException;
+	
+	long getFileLastModify( File file ) throws RemoteException;
+	
+	File locateFileOnServer( ExtendedFile file ) throws RemoteException;
 }

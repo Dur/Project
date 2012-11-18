@@ -2,6 +2,7 @@ package pl.dur.opa.view;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -35,9 +36,15 @@ public class View extends JPanel implements ActionListener
 	private ClientController controller;
 	private JMenuItem refreshItem = new JMenuItem( "refresh" );
 	private JMenuItem refreshRemoteItem = new JMenuItem( "refresh" );
+	private JMenuItem locateOnSever = new JMenuItem( "locate on server" );
 	private JMenuItem deleteItem = new JMenuItem( "delete" );
-	private JProgressBar localProgressBar = new JProgressBar( 0, 100);
-	private JProgressBar remoteProgressBar = new JProgressBar( 0, 100);
+	private JProgressBar localProgressBar = new JProgressBar( 0, 100 );
+	private JProgressBar remoteProgressBar = new JProgressBar( 0, 100 );
+	private JFrame messagePopup;
+	private JProgressBar popupProgress = new JProgressBar( 0, 100 );
+	private JPanel messagePanel;
+	private ExtendedFileSystemView extendedFileSystem;
+	private JCheckBox withCRCCheckBox;
 
 	public View( ClientController controller )
 	{
@@ -47,10 +54,6 @@ public class View extends JPanel implements ActionListener
 
 	private void initComponents() throws RemoteException
 	{
-		localProgressBar.setStringPainted( true );
-		localProgressBar.setString( "Ready");
-		remoteProgressBar.setStringPainted( true );
-		remoteProgressBar.setString( "Ready");
 		File[] roots = File.listRoots();
 		ArrayList<File> newRoots = new ArrayList<>();
 		for( File root : roots )
@@ -60,18 +63,43 @@ public class View extends JPanel implements ActionListener
 				newRoots.add( root );
 			}
 		}
+		roots = new File[ newRoots.size() ];
+		roots = (File[]) newRoots.toArray( roots );
+		extendedFileSystem = new ExtendedFileSystemView( roots, roots[0], controller );
+
+		messagePopup = new JFrame();
+		messagePanel = new JPanel( new BorderLayout() );
+		messagePanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		messagePanel.add( new JLabel(), BorderLayout.CENTER );
+		messagePanel.add( popupProgress, BorderLayout.PAGE_END );
+		popupProgress.setStringPainted( true );
+		messagePopup.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
+		messagePopup.add( messagePanel, BorderLayout.CENTER );
+		messagePanel.setPreferredSize( new Dimension( 300, 100 ) );
+		messagePopup.setLocationRelativeTo( null );
+		messagePopup.pack();
+		messagePopup.setAlwaysOnTop( true );
+
+		localProgressBar.setStringPainted( true );
+		localProgressBar.setString( "Ready" );
+		localProgressBar.setVisible( false );
+		remoteProgressBar.setStringPainted( true );
+		remoteProgressBar.setString( "Ready" );
+		remoteProgressBar.setIndeterminate( true );
+		remoteProgressBar.setVisible( false );
+
 		deleteItem.addActionListener( this );
+		locateOnSever.addActionListener( this );
 		refreshItem.addActionListener( this );
 		refreshRemoteItem.addActionListener( this );
 		JPopupMenu localPopup = new JPopupMenu( "localPopup" );
 		JPopupMenu remotePopup = new JPopupMenu( "remotePopup" );
 		localPopup.add( refreshItem );
+		localPopup.add( locateOnSever );
 		remotePopup.add( deleteItem );
 		remotePopup.add( refreshRemoteItem );
 
-		roots = new File[ newRoots.size() ];
-		roots = (File[]) newRoots.toArray( roots );
-		localFiles = new JFileChooser( new ExtendedFileSystemView( roots, roots[0], controller ) );
+		localFiles = new JFileChooser( extendedFileSystem );
 		localFiles.setMultiSelectionEnabled( true );
 		localFiles.setDragEnabled( true );
 		localFiles.setControlButtonsAreShown( false );
@@ -79,9 +107,7 @@ public class View extends JPanel implements ActionListener
 		localFiles.setFileView( new ExtendedFileView() );
 		localFiles.setComponentPopupMenu( localPopup );
 
-
-		remoteFiles = new JFileChooser( new RemoteFileBrowser( controller.
-				getManipulator().getFileSystemView() ) );
+		remoteFiles = new JFileChooser( new RemoteFileBrowser( controller.getManipulator().getFileSystemView() ) );
 		remoteFiles.setMultiSelectionEnabled( true );
 		remoteFiles.setDragEnabled( true );
 		remoteFiles.setControlButtonsAreShown( false );
@@ -90,9 +116,18 @@ public class View extends JPanel implements ActionListener
 
 		JPanel localPanel = new JPanel( new BorderLayout() );
 		localPanel.add( localFiles, BorderLayout.CENTER );
+		JLabel clientSideLabel = new JLabel( "Client Side" );
+		clientSideLabel.setFont( new Font( "sansserif", Font.BOLD, 32 ) );
+		localPanel.add( clientSideLabel, BorderLayout.PAGE_START );
+		withCRCCheckBox = new JCheckBox( "With CRC check" );
+		withCRCCheckBox.addActionListener( this );
+		localPanel.add( withCRCCheckBox, BorderLayout.PAGE_END );
 
 		JPanel remotePanel = new JPanel( new BorderLayout() );
 		remotePanel.add( remoteFiles, BorderLayout.CENTER );
+		JLabel serverSideLabel = new JLabel( "Server Side" );
+		serverSideLabel.setFont( new Font( "sansserif", Font.BOLD, 32 ) );
+		remotePanel.add( serverSideLabel, BorderLayout.PAGE_START );
 
 		send = new JButton( "Send" );
 		send.addActionListener( this );
@@ -133,7 +168,7 @@ public class View extends JPanel implements ActionListener
 
 		JPanel rightProgressPanel = new JPanel( new BorderLayout() );
 		rightProgressPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
-		rightProgressPanel.add(remoteProgressBar , BorderLayout.CENTER );
+		rightProgressPanel.add( remoteProgressBar, BorderLayout.CENTER );
 
 		JPanel leftLowerPanel = new JPanel( new BorderLayout() );
 		leftLowerPanel.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
@@ -158,18 +193,18 @@ public class View extends JPanel implements ActionListener
 
 		localNavi = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
 				leftPanel, leftLowerPanel );
-		localNavi.setDividerLocation( 300 );
-		localNavi.setPreferredSize( new Dimension( 450, 500 ) );
+		localNavi.setDividerLocation( 400 );
+		localNavi.setPreferredSize( new Dimension( 450, 600 ) );
 
 		serverNavi = new JSplitPane( JSplitPane.VERTICAL_SPLIT,
 				rightPanel, rightLowerPanel );
-		serverNavi.setDividerLocation( 300 );
-		serverNavi.setPreferredSize( new Dimension( 450, 500 ) );
+		serverNavi.setDividerLocation( 400 );
+		serverNavi.setPreferredSize( new Dimension( 450, 600 ) );
 
 		splitPane = new JSplitPane( JSplitPane.HORIZONTAL_SPLIT,
 				localNavi, serverNavi );
 		splitPane.setDividerLocation( 500 );
-		splitPane.setPreferredSize( new Dimension( 1000, 500 ) );
+		splitPane.setPreferredSize( new Dimension( 1000, 600 ) );
 
 		add( splitPane, BorderLayout.CENTER );
 	}
@@ -177,29 +212,24 @@ public class View extends JPanel implements ActionListener
 	public void receiveAction()
 	{
 		System.out.println( "Receive Action" );
-		List<File> filesToReceive = ((ListTransferHandler) rightDropZone.
-				getTransferHandler()).getFiles();
-		File fileToReceive = filesToReceive.get( 0 );
-		System.out.println( fileToReceive.length() );
+		List<File> filesToReceive = new ArrayList<File>( ((ListTransferHandler) rightDropZone.getTransferHandler()).
+				getFiles() );
 		File directory = localFiles.getCurrentDirectory();
-		controller.receiveFile( directory, fileToReceive );
+		controller.receiveFile( directory, filesToReceive );
 		((ListTransferHandler) rightDropZone.getTransferHandler()).clear();
 	}
 
 	public void sendAction()
 	{
 		System.out.println( "send action" );
-		List<File> filesToSend = ((ListTransferHandler) leftDropZone.
-				getTransferHandler()).getFiles();
-		File fileToSend = filesToSend.get( 0 );
+		List<File> filesToSend = new ArrayList<>( ((ListTransferHandler) leftDropZone.getTransferHandler()).getFiles() );
 		File directory = remoteFiles.getCurrentDirectory();
-		controller.sendFile( directory, fileToSend );
+		controller.sendFile( directory, filesToSend );
 		((ListTransferHandler) leftDropZone.getTransferHandler()).clear();
 	}
 
 	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event-dispatching thread.
+	 * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
 	 */
 	public void createAndShowGUI()
 	{
@@ -215,6 +245,8 @@ public class View extends JPanel implements ActionListener
 					break;
 				}
 			}
+			UIManager.put( "ProgressBar.repaintInterval", new Integer( 100 ) );
+			UIManager.put( "ProgressBar.cycleTime", new Integer( 2000 ) );
 		}
 		catch( Exception e )
 		{
@@ -223,7 +255,7 @@ public class View extends JPanel implements ActionListener
 
 		//Create and set up the window.
 		JFrame frame = new JFrame( "Opa Client" );
-		frame.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		try
 		{
 			//Create and set up the menu bar and content pane.
@@ -247,33 +279,97 @@ public class View extends JPanel implements ActionListener
 		if( e.getSource() == send )
 		{
 			sendAction();
+			return;
 		}
 		if( e.getSource() == receive )
 		{
 			receiveAction();
+			return;
 		}
 		if( e.getSource() == refreshItem )
 		{
+			localFiles.rescanCurrentDirectory();
 		}
 		if( e.getSource() == deleteItem )
 		{
-
-			File file = remoteFiles.getSelectedFile();
-			if( file != null )
+			File[] files = remoteFiles.getSelectedFiles();
+			if( files != null )
 			{
-				System.out.println( "selected file is " + file.getName() );
-				controller.deleteFile( file );
+				controller.deleteFile( files );
 			}
-
 		}
 		if( e.getSource() == refreshRemoteItem )
 		{
 			remoteFiles.rescanCurrentDirectory();
 		}
+		if( e.getSource() == withCRCCheckBox )
+		{
+			extendedFileSystem.setWithCRCCheck( withCRCCheckBox.isSelected() );
+		}
+		if( e.getSource() == locateOnSever )
+		{
+			if( localFiles.getSelectedFile() != null )
+			{
+				File file;
+				if( ( file = controller.locateFileOnServer( localFiles.getSelectedFile() ) ) != null  )
+				{
+					remoteFiles.setCurrentDirectory( file );
+				}
+			}
+		}
 	}
-	
+
 	public JProgressBar getLocalProgressBar()
 	{
 		return localProgressBar;
+	}
+
+	public void notifyUser( String message )
+	{
+		JLabel label = (JLabel) messagePanel.getComponent( 0 );
+		label.setVisible( true );
+		label.setText( message );
+		messagePopup.setVisible( true );
+		popupProgress.setVisible( false );
+	}
+
+	public void setServerComputingState( String message, boolean isComputing )
+	{
+		remoteProgressBar.setString( message );
+		remoteProgressBar.setVisible( isComputing );
+		remoteProgressBar.setIndeterminate( true );
+		send.setVisible( !isComputing );
+	}
+
+	public void serverProgressMessage( String message, int progress )
+	{
+		if( progress < 100 )
+		{
+			remoteProgressBar.setIndeterminate( false );
+			remoteProgressBar.setVisible( true );
+			remoteProgressBar.setValue( progress );
+			remoteProgressBar.setString( message + " " + progress + "%" );
+		}
+		else
+		{
+			remoteProgressBar.setVisible( false );
+		}
+	}
+	
+	public void showProgressPopup(String message, int value, boolean indeterminateMode )
+	{
+		messagePopup.setVisible( true );
+		this.popupProgress.setString( message );
+		popupProgress.setIndeterminate( indeterminateMode );
+		popupProgress.setValue( value );
+		popupProgress.setVisible( true );
+		JLabel label = (JLabel) messagePanel.getComponent( 0 );
+		label.setText("Please wait...");
+	}
+	
+	public void hideProgressPopup()
+	{
+		popupProgress.setVisible( false );
+		messagePopup.setVisible( false );
 	}
 }

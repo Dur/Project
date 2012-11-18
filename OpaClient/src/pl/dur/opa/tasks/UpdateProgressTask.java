@@ -27,24 +27,24 @@ public class UpdateProgressTask implements Task
 	public Object execute( Object params )
 	{
 		Fraction elem;
-		Double value;
+		int value;
 		while( !Thread.interrupted() )
 		{
 			try
 			{
 				elem = (Fraction) queue.take();
-				value = new Double( elem.getCounter() );
-				value = value / elem.getDenominator();
-				value = value * 100;
-				if( value.intValue() < 100 )
+				value = elem.getValue();
+				if( value < 100 )
 				{
-					bar.setValue( value.intValue() );
-					bar.setString( "Sending " + value.intValue() + "%" );
+					bar.setValue( value );
+					bar.setVisible( true );
+					bar.setString( elem.getCompleteMessage() );
 
 				}
 				else
 				{
 					bar.setString( "Ready" );
+					bar.setVisible( false );
 					bar.setValue( 0 );
 				}
 			}

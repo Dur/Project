@@ -189,37 +189,36 @@ public class LocalFileAdministrator
 		}
 		if( file.getFileCheckSum() != 0 )
 		{
-			return checkByCRC( fromMap, file );
+			return findByCRC( fromMap, file ) != null;
 		}
 		else
 		{
-			return checkWithoutCRC( fromMap, file );
+			return findWithoutCRC( fromMap, file ) != null;
 		}
 	}
 
-	private boolean checkByCRC( List<ExtendedFile> list, ExtendedFile file )
+	private ExtendedFile findByCRC( List<ExtendedFile> list, ExtendedFile file )
 	{
 		for( ExtendedFile temp : list )
 		{
 			if( temp.getFileCheckSum() == file.getFileCheckSum() )
 			{
-				return true;
+				return temp;
 			}
 		}
-		return false;
+		return null;
 	}
 
-	private boolean checkWithoutCRC( List<ExtendedFile> list, ExtendedFile file )
+	private ExtendedFile findWithoutCRC( List<ExtendedFile> list, ExtendedFile file )
 	{
 		for( ExtendedFile temp : list )
 		{
-			if( temp.lastModified() == file.lastModified() && temp.length() == file.
-					length() )
+			if( temp.lastModified() == file.lastModified() && temp.length() == file.length() )
 			{
-				return true;
+				return temp;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public void addNewFileToServer( String input, ExtendedFile file )
@@ -228,8 +227,7 @@ public class LocalFileAdministrator
 		try
 		{
 			ByteBuffer bbuf = ByteBuffer.wrap( input.getBytes() );
-			FileChannel wChannel = new FileOutputStream( filesList, true ).
-					getChannel();
+			FileChannel wChannel = new FileOutputStream( filesList, true ).getChannel();
 			wChannel.write( bbuf );
 			wChannel.close();
 			putFileIntoFilesMap( file );
@@ -247,5 +245,22 @@ public class LocalFileAdministrator
 	public File getHomeDir()
 	{
 		return homeDirectory;
+	}
+
+	public File locateFile( ExtendedFile file )
+	{
+		List<ExtendedFile> fromMap;
+		if( (fromMap = filesTree.get( file.getName() )) != null )
+		{
+			if( file.getFileCheckSum() != 0 )
+			{
+				return (findByCRC( fromMap, file )).getParentFile();
+			}
+			else
+			{
+				return (findWithoutCRC( fromMap, file )).getParentFile();
+			}
+		}
+		return null;
 	}
 }

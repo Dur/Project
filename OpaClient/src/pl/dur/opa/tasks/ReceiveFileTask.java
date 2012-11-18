@@ -1,6 +1,9 @@
 package pl.dur.opa.tasks;
 
 import java.io.File;
+import java.rmi.RemoteException;
+import java.util.List;
+import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.sockets.SocketWrapper;
 
 /**
@@ -12,11 +15,10 @@ import pl.dur.opa.sockets.SocketWrapper;
 public class ReceiveFileTask implements Task
 {
 	private final File directory;
-	private final String key;
-	private final String fileName;
 	private final String host;
 	private final Integer port;
-	private final long lastModified;
+	private UsersInterface manipulator;
+	private List<File> files;
 
 	/**
 	 * Constructor.
@@ -26,24 +28,37 @@ public class ReceiveFileTask implements Task
 	 * @param newHost - host to connect.
 	 * @param port - server port to connect.
 	 */
-	public ReceiveFileTask( final File newDirectory, final String newKey, 
-							final String newFileName, final String newHost,
+	public ReceiveFileTask( final File newDirectory,
+							List<File> files,
+							final String newHost,
 							final Integer port,
-							final long lastModified)
+							UsersInterface manipulator)
 	{
 		this.directory = newDirectory;
-		this.key = newKey;
-		this.fileName = newFileName;
 		this.host = newHost;
 		this.port = port;
-		this.lastModified = lastModified;
+		this.manipulator = manipulator;
+		this.files = files;
 	}
 
 	@Override
 	public final Object execute( final Object params )
 	{
 		final SocketWrapper socket = new SocketWrapper( port, host, null );
-		socket.receiveFile( key, fileName, directory, lastModified );
+		String key;
+		for( File fileToReceive : files )
+		{
+			try
+			{
+				key = manipulator.getFile( fileToReceive );
+				long lastModified = manipulator.getFileLastModify( fileToReceive );
+				socket.receiveFile( key, fileToReceive.getName(), directory, lastModified );
+			}
+			catch( RemoteException ex )
+			{
+				ex.printStackTrace();
+			}
+		}
 		return true;
 	}
 }
