@@ -350,6 +350,7 @@ public class View extends JPanel implements ActionListener
 	{
 		if( progress < 100 )
 		{
+			receive.setVisible( false );
 			remoteProgressBar.setIndeterminate( false );
 			remoteProgressBar.setVisible( true );
 			remoteProgressBar.setValue( progress );
@@ -357,6 +358,7 @@ public class View extends JPanel implements ActionListener
 		}
 		else
 		{
+			receive.setVisible( true );
 			remoteProgressBar.setVisible( false );
 		}
 	}
@@ -383,22 +385,8 @@ public class View extends JPanel implements ActionListener
 		frame.setVisible( false );
 	}
 	
-	public void showView()
+	public void setSendButtonVisible( boolean isVisible )
 	{
-		try
-		{
-			browser = new RemoteFileBrowser( controller.getManipulator().getFileSystemView() );
-			remoteFiles.setFileSystemView( browser );
-			remoteFiles.setCurrentDirectory( browser.getRoots()[0]);
-			remoteFiles.rescanCurrentDirectory();
-			frame.pack();
-			frame.repaint();
-		}
-		catch( RemoteException ex )
-		{
-			StateObserver.log( "Server disconnected for unknown reason" );
-			StateObserver.logOutUser();
-		}
-		frame.setVisible( true );
+		send.setVisible( isVisible );
 	}
 }

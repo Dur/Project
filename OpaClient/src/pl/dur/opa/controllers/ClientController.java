@@ -83,7 +83,7 @@ public class ClientController
 			}
 		} );
 		progress = new ArrayBlockingQueue<Fraction>( 100 );
-		TaskExecutor exec = new TaskExecutor( new UpdateProgressTask( progress, view.getLocalProgressBar() ) );
+		TaskExecutor exec = new TaskExecutor( new UpdateProgressTask( progress, this ) );
 		progressThread = new Thread( exec );
 		progressThread.start();
 		return true;
@@ -198,5 +198,14 @@ public class ClientController
 	{
 		view.hideView();
 		loggingPage.setVisible( true );
+	}
+	
+	public void updateProgressBar( String text, int percent, boolean isVisible, boolean indeterminateMode )
+	{
+		view.setSendButtonVisible( ! isVisible );
+		view.getLocalProgressBar().setString( text );
+		view.getLocalProgressBar().setValue( percent );
+		view.getLocalProgressBar().setIndeterminate( indeterminateMode );
+		view.getLocalProgressBar().setVisible( isVisible );
 	}
 }

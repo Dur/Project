@@ -6,6 +6,7 @@ package pl.dur.opa.tasks;
 
 import java.util.concurrent.BlockingQueue;
 import javax.swing.JProgressBar;
+import pl.dur.opa.controllers.ClientController;
 import pl.dur.opa.utils.Fraction;
 
 /**
@@ -14,12 +15,12 @@ import pl.dur.opa.utils.Fraction;
  */
 public class UpdateProgressTask implements Task
 {
-	private JProgressBar bar;
+	private ClientController controller;
 	private BlockingQueue<Fraction> queue;
 
-	public UpdateProgressTask( BlockingQueue<Fraction> queue, JProgressBar bar )
+	public UpdateProgressTask( BlockingQueue<Fraction> queue, ClientController controller )
 	{
-		this.bar = bar;
+		this.controller = controller;
 		this.queue = queue;
 	}
 
@@ -36,16 +37,11 @@ public class UpdateProgressTask implements Task
 				value = elem.getValue();
 				if( value < 100 )
 				{
-					bar.setValue( value );
-					bar.setVisible( true );
-					bar.setString( elem.getCompleteMessage() );
-
+					controller.updateProgressBar( elem.getCompleteMessage(), value, true, false );
 				}
 				else
 				{
-					bar.setString( "Ready" );
-					bar.setVisible( false );
-					bar.setValue( 0 );
+					controller.updateProgressBar( "Ready", 0, false, false );
 				}
 			}
 			catch( InterruptedException ex )
