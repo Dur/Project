@@ -61,7 +61,6 @@ public class UsersConfiguration
 						return;
 					}
 					users.put( key, value );
-					Logger.log( key + " = " + value );
 				}
 			}
 		}
@@ -71,7 +70,7 @@ public class UsersConfiguration
 		}
 		catch( IOException iex )
 		{
-			iex.printStackTrace();
+			Logger.log("Problem with configuration file");
 			return;
 		}
 	}

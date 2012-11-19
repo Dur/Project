@@ -1,19 +1,13 @@
 package pl.dur.opa.connection;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
 import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.tasks.SaveFileDescriptorTask;
 import pl.dur.opa.tasks.TaskExecutor;
 import pl.dur.opa.utils.ExtendedFile;
+import pl.dur.opa.utils.Logger;
 
 /**
  * Class to wrapp socket and make some operations on it. It can send files ad
@@ -46,12 +40,21 @@ public class SocketWrapper
 	 */
 	public void receiveFile( String name, File directory, LocalFileAdministrator fileAdmin, long lastModified, Notificator notificator )
 	{
+		String clientAddress = client.getInetAddress().getHostAddress();
+		ExtendedFile file = new ExtendedFile( directory.getPath() + File.separator + name );
+		FileOutputStream inFile=null;
 		try
 		{
-			ExtendedFile file = new ExtendedFile( directory.getPath() + File.separator + name );
+			inFile = new FileOutputStream( file );
+		}
+		catch( FileNotFoundException ex )
+		{
+			Logger.log("Problem with file "+file.getPath());
+		}
+		try
+		{
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			int len = 0;
-			FileOutputStream inFile = new FileOutputStream( file );
 			InputStream is = client.getInputStream();
 			BufferedInputStream bufferedInput = new BufferedInputStream( is, PACKAGE_SIZE );
 			while( (len = bufferedInput.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
@@ -60,7 +63,6 @@ public class SocketWrapper
 			}
 			client.close();
 			inFile.close();
-			System.out.println("Befor calculating crc");
 			file.setLastModified( lastModified );
 			file.length();
 			TaskExecutor executor = new TaskExecutor( new SaveFileDescriptorTask( file, fileAdmin, notificator ) );
@@ -69,21 +71,39 @@ public class SocketWrapper
 		}
 		catch( IOException ex )
 		{
-			ex.printStackTrace();
+			Logger.log( "Comunication with client " + clientAddress + " terminated for unknows reason" );
+			try
+			{
+				inFile.close();
+			}
+			catch( IOException ex1 )
+			{
+				Logger.log("Problem with file " + file.getPath() );
+			}
+			file.delete();
 		}
 	}
 
 	public void sendFile( File file, Notificator notificator )
 	{
 		Double size = new Double(file.length());
+		String clientAddress = client.getInetAddress().getHostAddress();
+		ExtendedFile fileToSend = new ExtendedFile( file.getPath() );
+		FileInputStream in = null;
 		try
 		{
-			
-			ExtendedFile fileToSend = new ExtendedFile( file.getPath() );
+			in = new FileInputStream( fileToSend );
+		}
+		catch( FileNotFoundException ex )
+		{
+			Logger.log("Problem with file to send");
+			return;
+		}
+		try
+		{
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			OutputStream os = client.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream( os, PACKAGE_SIZE );
-			FileInputStream in = new FileInputStream( fileToSend );
 			int len = 0;
 			int bytecount = 0;
 			while( (len = in.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
@@ -94,10 +114,21 @@ public class SocketWrapper
 				notificator.serverProgressMessage( "Sending: " + file.getName() + "  ", new Double((bytecount/size)*100).intValue());
 			}
 			client.shutdownOutput();
+			client.close();
+			out.close();
 		}
 		catch( IOException ex )
 		{
-			ex.printStackTrace();
+			try
+			{
+				client.close();
+				in.close();
+				Logger.log( "Comunication with client " + clientAddress + " terminated for unknows reason" );
+			}
+			catch( IOException ex1 )
+			{
+				Logger.log("Cannot close socket");
+			}
 		}
 	}
 }

@@ -1,17 +1,11 @@
 package pl.dur.opa.sockets;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import pl.dur.opa.file.browser.LocalFileAdministrator;
 import pl.dur.opa.utils.Fraction;
+import pl.dur.opa.utils.StateObserver;
 
 /**
  * Class to wrapp socket and make some operations on it. It can send files ad
@@ -52,13 +46,23 @@ public class SocketWrapper
 	 */
 	public void receiveFile( String key, String name, File directory, long lastModified )
 	{
+		fileAdmin = new LocalFileAdministrator( directory, name );
+		File file = fileAdmin.getFile();
+		FileOutputStream inFile = null;
+		try
+		{
+			inFile = new FileOutputStream( file );
+		}
+		catch( FileNotFoundException ex )
+		{
+			StateObserver.log("Problem with receiving file");
+			return;
+		}
 		try
 		{
 			socket = new Socket( host, port );
-			fileAdmin = new LocalFileAdministrator( directory, name );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			int len = 0;
-			FileOutputStream inFile = new FileOutputStream( fileAdmin.getFile() );
 			InputStream is = socket.getInputStream();
 			OutputStream outputSocket = socket.getOutputStream();
 			outputSocket.write( key.getBytes() );
@@ -74,7 +78,19 @@ public class SocketWrapper
 		}
 		catch( IOException ex )
 		{
-			ex.printStackTrace();
+			try
+			{
+				inFile.close();
+				socket.close();
+				StateObserver.log("Server terminated connection for unknown reason");
+				file.delete();
+				StateObserver.logOutUser();
+			}
+			catch( IOException ex1 )
+			{
+				StateObserver.log("Cannt close file");
+			}
+			
 		}
 	}
 
@@ -86,18 +102,25 @@ public class SocketWrapper
 	 */
 	public void sendFile( String key, File fileToSend, long lastModified )
 	{
+		FileInputStream in = null;
+		try
+		{
+			in = new FileInputStream( fileToSend );
+		}
+		catch( FileNotFoundException ex )
+		{
+			StateObserver.log("File not found");
+		}
 		try
 		{
 			Fraction fraction;
 			long bytesSend = 0;
 			Long fileSize = fileToSend.length();
 			socket = new Socket( host, port );
-			System.out.println( "After connecting to server" );
 			byte[] buffer = new byte[ PACKAGE_SIZE ];
 			OutputStream os = socket.getOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream( os, PACKAGE_SIZE );
 			out.write( key.getBytes() );
-			FileInputStream in = new FileInputStream( fileToSend );
 			int len = 0;
 			while( (len = in.read( buffer, 0, PACKAGE_SIZE )) != NO_DATA )
 			{
@@ -114,11 +137,21 @@ public class SocketWrapper
 		}
 		catch( IOException ex )
 		{
-			ex.printStackTrace();
+			try
+			{
+				StateObserver.log("Server terminated connection for unknown reason");
+				StateObserver.logOutUser();
+				socket.close();
+				in.close();
+			}
+			catch( IOException ex1 )
+			{
+				StateObserver.log("Problem with closing socket");
+			}
 		}
 		catch( InterruptedException ie )
 		{
-			ie.printStackTrace();
+			StateObserver.log("Interrupt exception");
 		}
 	}
 }

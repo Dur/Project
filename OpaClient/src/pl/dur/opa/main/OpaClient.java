@@ -56,9 +56,7 @@ public final class OpaClient
 		final OpaClient client = new OpaClient();
 		client.setController( new ClientController() );
 		client.setLoggingPage( new LoggingPage( client.getController() ));
-		client.setView( new View(client.getController()));
 		client.getController().setLoggingPage( client.getLoggingPage());
-		client.getController().setView( client.getView());
 		javax.swing.SwingUtilities.invokeLater( new Runnable()
 		{
 			public void run()

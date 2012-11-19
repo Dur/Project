@@ -8,10 +8,12 @@ import java.io.File;
 import java.rmi.RemoteException;
 import javax.swing.filechooser.FileSystemView;
 import pl.dur.opa.remote.interfaces.RemoteFileSystemView;
+import pl.dur.opa.utils.StateObserver;
 
 /**
- * Class extends FileSystemView. Makes user availlable to see remote system file system.
- * Also can be passsed to JFileChooser.
+ * Class extends FileSystemView. Makes user availlable to see remote system file system. Also can be passsed to
+ * JFileChooser.
+ *
  * @author Dur
  */
 public class RemoteFileBrowser extends FileSystemView
@@ -34,7 +36,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = null;
 		}
 		return file;
 	}
@@ -49,7 +53,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = null;
 		}
 		return file;
 	}
@@ -64,6 +70,8 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 			file = (File) null;
 		}
 		return file;
@@ -79,7 +87,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = parent;
 		}
 		return file;
 	}
@@ -94,6 +104,8 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 			file = (File) null;
 		}
 		return file;
@@ -109,7 +121,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File[]) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = new File[0];
 		}
 		return file;
 	}
@@ -124,6 +138,8 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 			file = (File) null;
 		}
 		return file;
@@ -139,7 +155,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = dir;
 		}
 		return file;
 	}
@@ -154,7 +172,9 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
-			file = (File[]) null;
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+			file = new File[0];
 		}
 		return file;
 	}
@@ -169,6 +189,8 @@ public class RemoteFileBrowser extends FileSystemView
 		}
 		catch( RemoteException ex )
 		{
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 			isRoot = false;
 		}
 		return isRoot;

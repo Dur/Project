@@ -45,7 +45,6 @@ public class ListTransferHandler extends TransferHandler
 		// Check for ExtendedFileList flavor
 		if( !info.isDataFlavorSupported( DataFlavor.javaFileListFlavor ) )
 		{
-			displayDropLocation( "List doesn't accept a drop of this type." );
 			return false;
 		}
 
@@ -82,11 +81,6 @@ public class ListTransferHandler extends TransferHandler
 	public List<File> getFiles()
 	{
 		return files;
-	}
-	
-	private void displayDropLocation( String string )
-	{
-		System.out.println( string );
 	}
 	
 	public void clear()

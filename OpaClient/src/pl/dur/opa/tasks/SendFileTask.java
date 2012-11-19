@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.sockets.SocketWrapper;
 import pl.dur.opa.utils.Fraction;
+import pl.dur.opa.utils.StateObserver;
 
 /**
  * Task class to implement sending file to user. 
@@ -60,7 +61,8 @@ public class SendFileTask implements Task
 			}
 			catch( RemoteException ex )
 			{
-				ex.printStackTrace();
+				StateObserver.log( "Server disconnected for unknown reason");
+				StateObserver.logOutUser();
 			}
 		}
 		return true;

@@ -50,7 +50,7 @@ public class UpdateProgressTask implements Task
 			}
 			catch( InterruptedException ex )
 			{
-				ex.printStackTrace();
+				return null;
 			}
 		}
 		return null;

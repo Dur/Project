@@ -123,7 +123,6 @@ public class LoggingPage extends javax.swing.JFrame
 	{//GEN-HEADEREND:event_onLoginAction
 		char[] pass = passwordTF.getPassword();
 		String password = String.valueOf( pass );
-		System.out.println("logging action");
 		if( ServerAddressTF.getText().length() == 0 || loginTF.getText().length() == 0 || password.
 				length() == 0 )
 		{
@@ -135,7 +134,6 @@ public class LoggingPage extends javax.swing.JFrame
 			if( controller.connectToServer( loginTF.getText(), password, ServerAddressTF.getText()) == true )
 			{
 				this.setVisible( false );
-				this.dispose();
 			}
 			else
 			{

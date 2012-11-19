@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.io.FileUtils;
 import pl.dur.opa.utils.ExtendedFile;
+import pl.dur.opa.utils.Logger;
 
 /**
  *
@@ -112,7 +113,7 @@ public class LocalFileAdministrator
 		{
 			for( ExtendedFile file : files )
 			{
-				System.out.println( file.getPath() + " " + file.getFileCheckSum() );
+				Logger.log( file.getPath() + " " + file.getFileCheckSum() );
 			}
 		}
 	}
@@ -121,22 +122,25 @@ public class LocalFileAdministrator
 	{
 		List<ExtendedFile> list = filesTree.get( file.getName() );
 		ExtendedFile fileToDelete = null;
-		for( ExtendedFile tempFile : list )
+		if( list != null && list.size() > 0 )
 		{
-			if( file.getPath().equals( tempFile.getPath() ) )
+			for( ExtendedFile tempFile : list )
 			{
-				fileToDelete = tempFile;
-				removeFileFromFile( file.getPath() );
-				file.delete();
-				break;
+				if( file.getPath().equals( tempFile.getPath() ) )
+				{
+					fileToDelete = tempFile;
+					removeFileFromFile( file.getPath() );
+					file.delete();
+					break;
+				}
 			}
-		}
-		if( fileToDelete != null )
-		{
-			list.remove( fileToDelete );
-			if( list.isEmpty() )
+			if( fileToDelete != null )
 			{
-				filesTree.remove( file.getName() );
+				list.remove( fileToDelete );
+				if( list.isEmpty() )
+				{
+					filesTree.remove( file.getName() );
+				}
 			}
 		}
 	}
@@ -223,7 +227,6 @@ public class LocalFileAdministrator
 
 	public void addNewFileToServer( String input, ExtendedFile file )
 	{
-		System.out.println( "Adding new file to server" );
 		try
 		{
 			ByteBuffer bbuf = ByteBuffer.wrap( input.getBytes() );

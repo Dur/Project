@@ -8,6 +8,7 @@ import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.remote.interfaces.UserAuthenticator;
 import pl.dur.opa.remote.interfaces.UsersInterface;
 import pl.dur.opa.server.configuration.UsersConfiguration;
+import pl.dur.opa.utils.Logger;
 
 /**
  *
@@ -40,6 +41,7 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 			RemoteFileSystemViewImpl filesView = new RemoteFileSystemViewImpl( roots, roots[0] );
 			manipulator = new UsersInterfaceImpl(fileAdmin.getHomeDir(), fileAdmin, filesView, notificator );
 			fileAdmin.listFiles();
+			Logger.log("User connected to server");
 			return manipulator;
 		}
 		else

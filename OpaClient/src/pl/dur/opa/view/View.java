@@ -9,6 +9,8 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.TitledBorder;
@@ -18,6 +20,7 @@ import pl.dur.opa.file.browser.ExtendedFileView;
 import pl.dur.opa.file.browser.RemoteFileBrowser;
 import pl.dur.opa.utils.ExtendedFileCellRenderer;
 import pl.dur.opa.utils.ListTransferHandler;
+import pl.dur.opa.utils.StateObserver;
 
 public class View extends JPanel implements ActionListener
 {
@@ -45,6 +48,9 @@ public class View extends JPanel implements ActionListener
 	private JPanel messagePanel;
 	private ExtendedFileSystemView extendedFileSystem;
 	private JCheckBox withCRCCheckBox;
+	private JFrame frame = new JFrame( "Opa Client" );
+	public boolean wasInitalized = false;
+	private RemoteFileBrowser browser;
 
 	public View( ClientController controller )
 	{
@@ -75,7 +81,7 @@ public class View extends JPanel implements ActionListener
 		popupProgress.setStringPainted( true );
 		messagePopup.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE );
 		messagePopup.add( messagePanel, BorderLayout.CENTER );
-		messagePanel.setPreferredSize( new Dimension( 300, 100 ) );
+		messagePanel.setPreferredSize( new Dimension( 400, 100 ) );
 		messagePopup.setLocationRelativeTo( null );
 		messagePopup.pack();
 		messagePopup.setAlwaysOnTop( true );
@@ -107,7 +113,8 @@ public class View extends JPanel implements ActionListener
 		localFiles.setFileView( new ExtendedFileView() );
 		localFiles.setComponentPopupMenu( localPopup );
 
-		remoteFiles = new JFileChooser( new RemoteFileBrowser( controller.getManipulator().getFileSystemView() ) );
+		browser = new RemoteFileBrowser( controller.getManipulator().getFileSystemView() );
+		remoteFiles = new JFileChooser( browser );
 		remoteFiles.setMultiSelectionEnabled( true );
 		remoteFiles.setDragEnabled( true );
 		remoteFiles.setControlButtonsAreShown( false );
@@ -211,7 +218,6 @@ public class View extends JPanel implements ActionListener
 
 	public void receiveAction()
 	{
-		System.out.println( "Receive Action" );
 		List<File> filesToReceive = new ArrayList<File>( ((ListTransferHandler) rightDropZone.getTransferHandler()).
 				getFiles() );
 		File directory = localFiles.getCurrentDirectory();
@@ -221,7 +227,6 @@ public class View extends JPanel implements ActionListener
 
 	public void sendAction()
 	{
-		System.out.println( "send action" );
 		List<File> filesToSend = new ArrayList<>( ((ListTransferHandler) leftDropZone.getTransferHandler()).getFiles() );
 		File directory = remoteFiles.getCurrentDirectory();
 		controller.sendFile( directory, filesToSend );
@@ -254,7 +259,6 @@ public class View extends JPanel implements ActionListener
 		}
 
 		//Create and set up the window.
-		JFrame frame = new JFrame( "Opa Client" );
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		try
 		{
@@ -289,6 +293,7 @@ public class View extends JPanel implements ActionListener
 		if( e.getSource() == refreshItem )
 		{
 			localFiles.rescanCurrentDirectory();
+			frame.repaint();
 		}
 		if( e.getSource() == deleteItem )
 		{
@@ -371,5 +376,29 @@ public class View extends JPanel implements ActionListener
 	{
 		popupProgress.setVisible( false );
 		messagePopup.setVisible( false );
+	}
+	
+	public void hideView()
+	{
+		frame.setVisible( false );
+	}
+	
+	public void showView()
+	{
+		try
+		{
+			browser = new RemoteFileBrowser( controller.getManipulator().getFileSystemView() );
+			remoteFiles.setFileSystemView( browser );
+			remoteFiles.setCurrentDirectory( browser.getRoots()[0]);
+			remoteFiles.rescanCurrentDirectory();
+			frame.pack();
+			frame.repaint();
+		}
+		catch( RemoteException ex )
+		{
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
+		}
+		frame.setVisible( true );
 	}
 }

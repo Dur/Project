@@ -19,6 +19,7 @@ import pl.dur.opa.tasks.TaskExecutor;
 import pl.dur.opa.tasks.UpdateProgressTask;
 import pl.dur.opa.utils.ExtendedFile;
 import pl.dur.opa.utils.Fraction;
+import pl.dur.opa.utils.StateObserver;
 import pl.dur.opa.view.LoggingPage;
 import pl.dur.opa.view.View;
 
@@ -35,19 +36,27 @@ public class ClientController
 	private BlockingQueue<Fraction> progress;
 	private NotificatorImpl notificator;
 	private static Integer DEFAULT_SERVER_PORT = 1099;
+	private Thread progressThread = null;
+
 	public ClientController()
 	{
 		System.setSecurityManager( new RMISecurityManager() );
+		StateObserver.setController( this );
 	}
 
 	public boolean connectToServer( String login, String password, String serverAddress )
 	{
-		StringTokenizer tokenizer = new StringTokenizer( serverAddress, ":");
+		view = new View( this );
+		if( progressThread != null && progressThread.isAlive() )
+		{
+			progressThread.interrupt();
+		}
+		StringTokenizer tokenizer = new StringTokenizer( serverAddress, ":" );
 		String host = tokenizer.nextToken();
 		Integer port = DEFAULT_SERVER_PORT;
 		if( tokenizer.hasMoreTokens() )
 		{
-			port = new Integer(tokenizer.nextToken());
+			port = new Integer( tokenizer.nextToken() );
 		}
 		this.serverAddress = serverAddress;
 		try
@@ -64,7 +73,6 @@ public class ClientController
 		}
 		catch( Exception e )
 		{
-			System.out.println( e.toString() );
 			return false;
 		}
 		javax.swing.SwingUtilities.invokeLater( new Runnable()
@@ -75,9 +83,8 @@ public class ClientController
 			}
 		} );
 		progress = new ArrayBlockingQueue<Fraction>( 100 );
-		TaskExecutor exec = new TaskExecutor( new UpdateProgressTask( progress, view.
-				getLocalProgressBar() ) );
-		Thread progressThread = new Thread( exec );
+		TaskExecutor exec = new TaskExecutor( new UpdateProgressTask( progress, view.getLocalProgressBar() ) );
+		progressThread = new Thread( exec );
 		progressThread.start();
 		return true;
 	}
@@ -92,8 +99,8 @@ public class ClientController
 
 	public void receiveFile( File localDirectory, List<File> remoteFiles )
 	{
-		TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( localDirectory, remoteFiles, 
-													serverAddress, 80, manipulator ) );
+		TaskExecutor executor = new TaskExecutor( new ReceiveFileTask( localDirectory, remoteFiles,
+				serverAddress, 80, manipulator ) );
 		Thread thread = new Thread( executor );
 		thread.start();
 	}
@@ -106,7 +113,8 @@ public class ClientController
 		}
 		catch( RemoteException ex )
 		{
-			ex.printStackTrace();
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 		}
 		return files;
 	}
@@ -122,7 +130,8 @@ public class ClientController
 		}
 		catch( RemoteException ex )
 		{
-			ex.printStackTrace();
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 		}
 	}
 
@@ -155,8 +164,13 @@ public class ClientController
 	{
 		this.manipulator = manipulator;
 	}
-	
-	public File locateFileOnServer(File file)
+
+	public void showMessageToUser( String text )
+	{
+		view.notifyUser( text );
+	}
+
+	public File locateFileOnServer( File file )
 	{
 		try
 		{
@@ -164,18 +178,25 @@ public class ClientController
 		}
 		catch( RemoteException ex )
 		{
-			ex.printStackTrace();
+			StateObserver.log( "Server disconnected for unknown reason" );
+			StateObserver.logOutUser();
 			return null;
 		}
 	}
-	
+
 	public void notifyViewOfProgress( String info, int value, boolean indeterminateMode )
 	{
-		view.showProgressPopup(info, value, indeterminateMode );
+		view.showProgressPopup( info, value, indeterminateMode );
 	}
-	
+
 	public void hideProgressPopup()
 	{
 		view.hideProgressPopup();
+	}
+
+	public void logOutUser()
+	{
+		view.hideView();
+		loggingPage.setVisible( true );
 	}
 }

@@ -5,11 +5,10 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import pl.dur.opa.tasks.SocketTask;
 import pl.dur.opa.tasks.Task;
 import pl.dur.opa.tasks.TaskExecutor;
+import pl.dur.opa.utils.Logger;
 
 /** 
  * Class which contains server socket to allow clients to connect to serwer.
@@ -39,8 +38,7 @@ public class ConnectionAccepter implements Runnable
 		}
 		catch( IOException ex )
 		{
-			Logger.getLogger( ConnectionAccepter.class.getName() ).
-					log( Level.SEVERE, null, ex );
+			Logger.log("Cant initalize connection");
 		}
 	}
 
@@ -57,6 +55,7 @@ public class ConnectionAccepter implements Runnable
 			try
 			{
 				clientSocket = socket.accept();
+				Logger.log("User " + clientSocket.getInetAddress().getHostAddress() + " connected");
 				is = clientSocket.getInputStream();
 				if( is.read( taskKey, 0, KEY_SIZE ) != NO_DATA )
 				{
@@ -81,8 +80,7 @@ public class ConnectionAccepter implements Runnable
 			}
 			catch( IOException ex )
 			{
-				Logger.getLogger( ConnectionAccepter.class.getName() ).
-						log( Level.SEVERE, null, ex );
+				Logger.log("Problem with accept connection");
 			}
 		}
 	}
