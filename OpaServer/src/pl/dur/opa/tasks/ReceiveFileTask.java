@@ -40,7 +40,7 @@ public class ReceiveFileTask extends TaskNotificator implements Task, SocketTask
 	@Override
 	public final Object execute( final Object params )
 	{
-		socketWrapper.receiveFile( fileName, directory, fileAdmin, lastModified, super.getNotificator() );
+		socketWrapper.receiveFile( fileName, directory, fileAdmin, lastModified, notificator );
 		return true;
 	}
 

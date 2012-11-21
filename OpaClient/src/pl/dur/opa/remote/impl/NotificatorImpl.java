@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dur.opa.remote.impl;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.concurrent.BlockingQueue;
 import pl.dur.opa.remote.interfaces.Notificator;
 import pl.dur.opa.view.View;
 
@@ -16,9 +11,6 @@ import pl.dur.opa.view.View;
  */
 public class NotificatorImpl extends UnicastRemoteObject implements Notificator
 {
-
-	private BlockingQueue<Object> notify;
-	
 	private View view;
 	
 	public NotificatorImpl( View view ) throws RemoteException

@@ -40,7 +40,6 @@ public class UserAuthenticatorImpl extends UnicastRemoteObject implements UserAu
 			roots[0] = fileAdmin.getHomeDir();
 			RemoteFileSystemViewImpl filesView = new RemoteFileSystemViewImpl( roots, roots[0] );
 			manipulator = new UsersInterfaceImpl(fileAdmin.getHomeDir(), fileAdmin, filesView, notificator );
-			fileAdmin.listFiles();
 			Logger.log("User connected to server");
 			return manipulator;
 		}
