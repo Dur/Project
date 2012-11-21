@@ -6,7 +6,6 @@ package pl.dur.opa.utils;
 
 import java.io.File;
 import java.net.URI;
-import javax.swing.Icon;
 
 /**
  *
@@ -16,9 +15,9 @@ public class ExtendedFile extends File
 {
 	private long fileCheckSum;
 	
-	private Icon fileIcon;
+	private Long lastModifiedDate;
 	
-	private boolean isConflicted;
+	private Long fileSize;
 	
 	private boolean isStored;
 	
@@ -58,24 +57,24 @@ public class ExtendedFile extends File
 		this.fileCheckSum = fileCheckSum;
 	}
 
-	public Icon getFileIcon()
+	public Long getFileSize()
 	{
-		return fileIcon;
+		return fileSize;
 	}
 
-	public void setFileIcon( Icon fileIcon )
+	public void setFileSize( Long fileSize )
 	{
-		this.fileIcon = fileIcon;
+		this.fileSize = fileSize;
 	}
 
-	public boolean isIsConflicted()
+	public Long getLastModifiedDate()
 	{
-		return isConflicted;
+		return lastModifiedDate;
 	}
 
-	public void setIsConflicted( boolean isConflicted )
+	public void setLastModifiedDate( Long lastModifiedDate )
 	{
-		this.isConflicted = isConflicted;
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public boolean isIsStored()

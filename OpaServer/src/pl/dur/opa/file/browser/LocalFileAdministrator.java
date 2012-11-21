@@ -217,7 +217,7 @@ public class LocalFileAdministrator
 	{
 		for( ExtendedFile temp : list )
 		{
-			if( temp.lastModified() == file.lastModified() && temp.length() == file.length() )
+			if( temp.lastModified() == file.getLastModifiedDate() && temp.length() == file.getFileSize() )
 			{
 				return temp;
 			}

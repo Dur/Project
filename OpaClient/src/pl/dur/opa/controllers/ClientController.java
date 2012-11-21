@@ -109,6 +109,11 @@ public class ClientController
 	{
 		try
 		{
+			for( ExtendedFile file : files )
+			{
+				file.setFileSize( file.length() );
+				file.setLastModifiedDate( file.lastModified() );
+			}
 			files = manipulator.checkFilesBackups( files );
 		}
 		catch( RemoteException ex )
