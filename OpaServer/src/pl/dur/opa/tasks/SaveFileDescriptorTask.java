@@ -39,6 +39,7 @@ public class SaveFileDescriptorTask extends TaskNotificator implements Task
 			super.getNotificator().serverComputingMessage( "Calculating CRC", true);
 			Long CRC = Files.getChecksum( savedFile, new java.util.zip.CRC32() );
 			String input = savedFile.getPath() + ";" + CRC + "\n";
+			savedFile.setFileCheckSum( CRC );
 			fileAdmin.addNewFileToServer( input, savedFile );
 			super.getNotificator().serverComputingMessage( "Ready", false);
 		}
