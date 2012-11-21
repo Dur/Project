@@ -9,9 +9,9 @@ import java.rmi.RemoteException;
  */
 public interface Notificator extends Remote
 {
-	public void serverComputingMessage(String message, boolean isComputing);
+	public void serverComputingMessage(String message, boolean isComputing) throws RemoteException;
 	
-	public void sendMessageToClient(String message);
+	public void sendMessageToClient(String message) throws RemoteException;
 	
-	public void serverProgressMessage( String message, int progress );
+	public void serverProgressMessage( String message, int progress ) throws RemoteException;
 }
