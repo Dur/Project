@@ -45,7 +45,7 @@ public class RemoteFileSystemViewImpl extends UnicastRemoteObject implements Rem
 			while( newFolder.exists() && (i < 100) )
 			{
 				newFolder = createFileObject( containingDir, 
-						MessageFormat.format( newFolderString, new Object[]
+						MessageFormat.format( newFolderString+i, new Object[]
 						{
 							new Integer( i )
 						} ) 
